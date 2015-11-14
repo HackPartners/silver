@@ -1,0 +1,124 @@
+<xs:schema 
+    xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+    targetNamespace="http://schemas.xmlsoap.org/soap/envelope/"
+    xmlns:tns="http://schemas.xmlsoap.org/soap/envelope/" 
+    xmlns:shop="http://railgds.net/ws/shopping"
+    xmlns:com="http://railgds.net/ws/commontypes"
+    xmlns:book="http://railgds.net/ws/booking">
+
+    <xs:import namespace="http://railgds.net/ws/commontypes" schemaLocation="CommonTypes_2_65.xsd"/>
+    <xs:import namespace="http://railgds.net/ws/shopping" schemaLocation="ShoppingServicesSchema_2_65.xsd"/>
+    <xs:import namespace="http://railgds.net/ws/booking" schemaLocation="BookingServicesSchema_2_65.xsd"/>
+
+    <!--  Envelope, header and body  -->
+    <xs:element name="Envelope" type="tns:Envelope"/>
+    <xs:complexType name="Envelope">
+        <xs:sequence>
+            <xs:element ref="tns:Header" minOccurs="0"/>
+            <xs:element ref="tns:Body" minOccurs="1"/>
+            <xs:any namespace="##other" minOccurs="0" maxOccurs="unbounded" processContents="lax"/>
+        </xs:sequence>
+        <xs:anyAttribute namespace="##other" processContents="lax"/>
+    </xs:complexType>
+    <xs:element name="Header" type="tns:Header"/>
+    <xs:complexType name="Header">
+        <xs:sequence>
+            <xs:any namespace="##other" minOccurs="0" maxOccurs="unbounded" processContents="lax"/>
+        </xs:sequence>
+        <xs:anyAttribute namespace="##other" processContents="lax"/>
+    </xs:complexType>
+    <xs:element name="Body" type="tns:Body"/>
+    <xs:complexType name="Body">
+        <xs:sequence>
+            <xs:element name="pointToPointShoppingRequest" type="shop:PointToPointShoppingRequestType" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="pointToPointShoppingResponse" type="shop:PointToPointShoppingResponseType" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="travelPassShoppingRequest" type="shop:TravelPassShoppingRequestType" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="travelPassShoppingResponse" type="shop:TravelPassShoppingResponseType" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="scheduleSearchRequest" type="shop:ScheduleSearchRequestType" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="scheduleSearchResponse" type="shop:ScheduleSearchResponseType" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="addPaymentRequest" type="book:AddPaymentRequestType" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="addPaymentResponse" type="book:AddPaymentResponseType" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="authenticatePayerRequest" type="book:AuthenticatePayerRequestType" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="authenticatePayerResponse" type="book:AuthenticatePayerResponseType" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="cancelBookingRecordRequest" type="book:CancelBookingRecordRequestType" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="cancelBookingRecordResponse" type="book:CancelBookingRecordResponseType" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="claimValueDocumentRequest" type="book:ClaimValueDocumentRequestType" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="claimValueDocumentResponse" type="book:ClaimValueDocumentResponseType" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="confirmBookingRecordRequest" type="book:ConfirmBookingRecordRequestType" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="confirmBookingRecordResponse" type="book:ConfirmBookingRecordResponseType" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="createBookingRecordRequest" type="book:CreateBookingRecordRequestType" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="createBookingRecordResponse" type="book:CreateBookingRecordResponseType" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="recordFinancialTransactionRequest" type="book:RecordFinancialTransactionRequestType" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="recordFinancialTransactionResponse" type="book:RecordFinancialTransactionResponseType" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="redeliverValueDocumentRequest" type="book:RedeliverValueDocumentRequestType" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="redeliverValueDocumentResponse" type="book:RedeliverValueDocumentResponseType" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="retrieveBookingRecordRequest" type="book:RetrieveBookingRecordRequestType" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="retrieveBookingRecordResponse" type="book:RetrieveBookingRecordResponseType" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="returnValueDocumentRequest" type="book:ReturnValueDocumentRequestType" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="returnValueDocumentResponse" type="book:ReturnValueDocumentResponseType" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="searchBookingRecordsRequest" type="book:SearchBookingRecordsRequestType" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="searchBookingRecordsResponse" type="book:SearchBookingRecordsResponseType" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="updateBookingRecordRequest" type="book:UpdateBookingRecordRequestType" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="updateBookingRecordResponse" type="book:UpdateBookingRecordResponseType" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="refundBookingRecordRequest" type="book:RefundBookingRecordRequestType" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="refundBookingRecordResponse" type="book:RefundBookingRecordResponseType" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="validateBookingRecordInformationRequest" type="book:ValidateBookingRecordInformationRequestType" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="validateBookingRecordInformationResponse" type="book:ValidateBookingRecordInformationResponseType" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="generatePaymentTokenRequest" type="book:GeneratePaymentTokenRequestType" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="generatePaymentTokenResponse" type="book:GeneratePaymentTokenResponseType" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="deletePaymentTokenRequest" type="book:DeletePaymentTokenRequestType" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="deletePaymentTokenResponse" type="book:DeletePaymentTokenResponseType" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="retrieveCancellationSummaryRequest" type="book:RetrieveCancellationSummaryRequestType" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="retrieveCancellationSummaryResponse" type="book:RetrieveCancellationSummaryResponseType" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:any namespace="##any" minOccurs="0" maxOccurs="unbounded" processContents="lax"/>
+        </xs:sequence>
+        <xs:anyAttribute namespace="##any" processContents="lax">
+            <xs:annotation>
+                <xs:documentation>
+                    Prose in the spec does not specify that attributes are allowed on the Body element
+                </xs:documentation>
+            </xs:annotation>
+        </xs:anyAttribute>
+    </xs:complexType>
+<!--
+ Global Attributes.  The following attributes are intended to be usable via qualified attribute names on any complex type referencing them.  
+-->
+<xs:attribute name="mustUnderstand">
+    <xs:simpleType>
+        <xs:restriction base="xs:boolean">
+            <xs:pattern value="0|1"/>
+        </xs:restriction>
+    </xs:simpleType>
+</xs:attribute>
+<xs:attribute name="actor" type="xs:anyURI"/>
+<xs:simpleType name="encodingStyle">
+    <xs:annotation>
+        <xs:documentation>
+            'encodingStyle' indicates any canonicalization conventions followed in the contents of the containing element. For example, the value 'http://schemas.xmlsoap.org/soap/encoding/' indicates the pattern described in SOAP specification
+        </xs:documentation>
+    </xs:annotation>
+    <xs:list itemType="xs:anyURI"/>
+</xs:simpleType>
+<xs:attribute name="encodingStyle" type="tns:encodingStyle"/>
+<xs:attributeGroup name="encodingStyle">
+    <xs:attribute ref="tns:encodingStyle"/>
+</xs:attributeGroup>
+<xs:element name="Fault" type="tns:Fault"/>
+<xs:complexType name="Fault" final="extension">
+    <xs:annotation>
+        <xs:documentation>Fault reporting structure</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+        <xs:element name="faultcode" type="xs:QName"/>
+        <xs:element name="faultstring" type="xs:string"/>
+        <xs:element name="faultactor" type="xs:anyURI" minOccurs="0"/>
+        <xs:element name="detail" type="tns:detail" minOccurs="0"/>
+    </xs:sequence>
+</xs:complexType>
+<xs:complexType name="detail">
+    <xs:sequence>
+        <xs:any namespace="##any" minOccurs="0" maxOccurs="unbounded" processContents="lax"/>
+    </xs:sequence>
+    <xs:anyAttribute namespace="##any" processContents="lax"/>
+</xs:complexType>
+</xs:schema>

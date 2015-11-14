@@ -1,0 +1,2711 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright 2013, SilverRail Technologies, Inc. All rights reserved.
+  -->
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:com="http://railgds.net/ws/commontypes"
+	targetNamespace="http://railgds.net/ws/commontypes" elementFormDefault="qualified"
+	attributeFormDefault="unqualified" version="2.65">
+	<xs:complexType name="AddressType">
+		<xs:sequence>
+			<xs:element name="company" type="xs:string" minOccurs="0"/>
+			<xs:element name="address1" type="xs:string"/>
+			<xs:element name="address2" type="xs:string" minOccurs="0"/>
+			<xs:element name="city" type="xs:string"/>
+			<xs:element name="stateProv" type="com:StateProvType" minOccurs="0"/>
+			<xs:element name="zipCode" type="xs:string" minOccurs="0"/>
+			<xs:element name="country" type="com:ISOCountryCodeType"/>
+            <xs:element name="country3" type="com:ISOCountryCode3Type" minOccurs="0"/>
+            <xs:element name="email" type="xs:string" minOccurs="0"/>
+			<xs:element name="addressType">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="HOME"/>
+						<xs:enumeration value="BUSINESS"/>
+						<xs:enumeration value="UNKNOWN"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="AgencyCodeType">
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="10"/>
+			<xs:minLength value="1"/>
+			<xs:pattern value="[a-zA-Z0-9]+"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="AmenityType">
+      <xs:simpleContent>
+          <xs:extension base="xs:string">
+              <xs:attribute name="type" use="required">
+                  <xs:simpleType>
+                      <xs:restriction base="xs:string">
+						<xs:enumeration value="BAGGAGE"/>
+						<xs:enumeration value="BAR"/>
+						<xs:enumeration value="BUFFET"/>
+						<xs:enumeration value="DINING"/>
+						<xs:enumeration value="HOT_FOOD"/>
+						<xs:enumeration value="LOUNGE"/>
+						<xs:enumeration value="MEAL"/>
+						<xs:enumeration value="NETWORK"/>
+						<xs:enumeration value="NEWSPAPER"/>
+						<xs:enumeration value="QUIET"/>
+						<xs:enumeration value="SNACK"/>
+						<xs:enumeration value="TAXI"/>
+						<xs:enumeration value="TROLLEY"/>
+						<xs:enumeration value="WHEELCHAIR"/>
+						<xs:enumeration value="WHEELCHAIR_RES"/>
+						<xs:enumeration value="AUDIO"/>
+						<xs:enumeration value="VIDEO"/>
+						<xs:enumeration value="POWER_SOCKET"/>
+						<xs:enumeration value="LOUNGE_ACCESS"/>
+						<xs:enumeration value="INTERNET"/>
+						<xs:enumeration value="INTERNET_AVAILABLE"/>
+						<xs:enumeration value="PARKING"/>
+					  </xs:restriction>
+                  </xs:simpleType>
+              </xs:attribute>
+          </xs:extension>
+      </xs:simpleContent>
+  </xs:complexType>
+
+	<xs:simpleType name="AnorakRecordLocatorType">
+		<xs:restriction base="xs:string"/>
+	</xs:simpleType>
+	<xs:simpleType name="AnorakReceiptLocatorType">
+		<xs:restriction base="xs:string"/>
+	</xs:simpleType>
+	<xs:complexType name="BaseCreditCardType" abstract="true">
+		<xs:sequence>
+            <xs:element name="number" type="xs:string" minOccurs="0"/>
+			<xs:element name="expirationYearMonth" type="xs:gYearMonth"/>
+			<xs:element name="cardholderName" type="xs:string"/>
+			<xs:element name="billingAddress" type="com:AddressType"/>
+			<xs:element name="siteCard" type="xs:boolean" minOccurs="0"/>
+            <xs:element name="paymentToken" type="xs:string"  minOccurs="0"/>
+		</xs:sequence>
+		<xs:attribute name="type" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="AX"/>
+					<xs:enumeration value="VI"/>
+					<xs:enumeration value="CA"/>
+					<xs:enumeration value="DI"/>
+					<xs:enumeration value="UA"/>
+                    <xs:enumeration value="DC"/>
+                    <xs:enumeration value="JC"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+	<xs:complexType name="BaseDebitCardType" abstract="true">
+		<xs:sequence>
+            <xs:element name="number" type="xs:string" minOccurs="0"/>
+			<xs:element name="startYearMonth" type="xs:gYearMonth" minOccurs="0"/>
+			<xs:element name="expirationYearMonth" type="xs:gYearMonth"/>
+			<xs:element name="cardholderName" type="xs:string"/>
+			<xs:element name="billingAddress" type="com:AddressType"/>
+            <xs:element name="paymentToken" type="xs:string"  minOccurs="0"/>
+		</xs:sequence>
+		<xs:attribute name="type" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="SD"/>
+					<xs:enumeration value="VD"/>
+					<xs:enumeration value="MD"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+    <xs:complexType name="BaseConfirmationCardType" abstract="true">
+        <xs:sequence>
+            <xs:element name="cardholderNameLast" type="xs:string"/>
+            <xs:element name="cardholderNameFirst" type="xs:string" minOccurs="0"/>
+            <xs:element name="cardholderNameMiddle" type="xs:string" minOccurs="0"/>
+            <xs:element name="cardNumber" type="xs:string" minOccurs="0"/>
+            <xs:element name="paymentToken" type="xs:string" minOccurs="0" />
+            <xs:element name="expirationYearMonth" type="xs:gYearMonth" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="selectedConfirmationOptionType">
+        <xs:sequence>
+          <xs:choice>
+            <xs:element name="creditCardOption" minOccurs="0">
+                <xs:complexType>
+                    <xs:complexContent>
+                        <xs:extension base="com:BaseConfirmationCardType"/>
+                    </xs:complexContent>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="debitCardOption" minOccurs="0">
+                <xs:complexType>
+                    <xs:complexContent>
+                        <xs:extension base="com:BaseConfirmationCardType">
+                            <xs:sequence>
+                                <xs:element name="sortCode" type="xs:string" minOccurs="0"/>
+                            </xs:sequence>
+                        </xs:extension>
+                    </xs:complexContent>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="loyaltyCardOption" minOccurs="0">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="program" type="xs:string"/>
+                        <xs:element name="identifier" type="xs:string"/>
+                        <xs:element name="expirationYearMonthDay" type="xs:date" minOccurs="0"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="personalIdentificationCardOption" minOccurs="0">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="cardholderNameLast" type="xs:string"/>
+                        <xs:element name="cardholderNameFirst" type="xs:string" minOccurs="0"/>
+                        <xs:element name="cardholderNameMiddle" type="xs:string" minOccurs="0"/>
+                        <xs:element name="identifier" type="xs:string" minOccurs="0"/>
+                        <xs:element name="countryCode" type="xs:string"/>
+                        <xs:element name="expirationYearMonthDay" type="xs:date"/>
+                        <xs:element name="dateOfBirth" type="xs:date" minOccurs="0"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+          </xs:choice>
+        </xs:sequence>
+    </xs:complexType>
+
+	<xs:complexType name="BaseECheckType">
+		<xs:sequence>
+			<xs:element name="number" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="BaseRequestType" abstract="true">
+		<xs:sequence>
+			<xs:element name="context" type="com:ContextType"/>
+			<xs:element minOccurs="0" name="overrides">
+				<xs:annotation>
+					<xs:documentation>Optional request overrides for testing.</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element maxOccurs="unbounded" name="override">
+							<xs:complexType>
+								<xs:attribute name="name" use="required"/>
+								<xs:attribute name="type" use="required"/>
+								<xs:attribute name="value" use="required"/>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="conversationToken" type="xs:string"/>
+		<xs:attribute name="version" type="xs:string"/>
+		<xs:attribute name="dateTime" type="xs:string"/>
+	</xs:complexType>
+	<xs:complexType name="BaseResponseType" abstract="true">
+		<xs:sequence>
+			<xs:element name="requestStatus" type="com:RequestStatusType"/>
+		</xs:sequence>
+		<xs:attribute name="conversationToken" type="xs:string"/>
+		<xs:attribute name="version" type="xs:string"/>
+	</xs:complexType>
+	<xs:complexType name="BookingRecordType">
+		<xs:sequence>
+            <xs:element name="updateable" type="com:UpdateableBookingType" minOccurs="0"/>
+			<xs:element name="bookingDate" type="xs:date"/>
+			<xs:element name="departureDate" type="xs:date"/>
+			<xs:element name="numberOfOrders" type="xs:int"/>
+			<xs:element name="revenueTotal" type="com:MoneyType"/>
+			<xs:element name="receiptsTotal" type="com:MoneyType"/>
+			<xs:element name="passengers">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="passenger" type="com:PassengerType" maxOccurs="unbounded"
+						/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="orders">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="order" maxOccurs="unbounded">
+							<xs:complexType>
+								<xs:complexContent>
+									<xs:extension base="com:OrderType">
+										<xs:sequence>
+                                            <xs:element name="updateable" type="com:UpdateableOrderType" minOccurs="0"/>
+											<xs:element name="travelSegments" minOccurs="0">
+												<xs:complexType>
+												<xs:sequence>
+												<xs:element name="travelSegment"
+												type="com:TravelSegmentType" minOccurs="0" maxOccurs="unbounded"
+												/>
+												</xs:sequence>
+												</xs:complexType>
+											</xs:element>
+											<xs:element name="ticketableFares" minOccurs="0">
+												<xs:complexType>
+												<xs:sequence>
+												<xs:element name="ticketableFare"
+												type="com:TicketableFareType"
+												maxOccurs="unbounded"/>
+												</xs:sequence>
+												</xs:complexType>
+											</xs:element>
+											<xs:element name="ticketingOptions" minOccurs="0">
+												<xs:complexType>
+												<xs:sequence>
+												<xs:element name="ticketingOption"
+												type="com:TicketingOptionType"
+												maxOccurs="unbounded"/>
+												</xs:sequence>
+												</xs:complexType>
+											</xs:element>
+											<xs:element name="financials" minOccurs="0">
+												<xs:complexType>
+												<xs:sequence>
+												<xs:element name="totalPrice" type="com:MoneyType"/>
+												<xs:element name="basePrice" type="com:MoneyType"
+												minOccurs="0"/>
+												<xs:element name="upgradePrice"
+												type="com:MoneyType" minOccurs="0"/>
+												<xs:element name="accommodationPrice"
+												type="com:MoneyType" minOccurs="0"/>
+												<xs:element name="taxes" type="com:MoneyType"
+												minOccurs="0"/>
+												<xs:element name="fees" type="com:MoneyType"
+												minOccurs="0"/>
+												<xs:element name="commissionAmount"
+												type="com:MoneyType" minOccurs="0"/>
+												</xs:sequence>
+												</xs:complexType>
+											</xs:element>
+                                            <xs:element name="supplyChannelPassengers" minOccurs="0" maxOccurs="1">
+                                                <xs:complexType>
+                                                    <xs:sequence>
+                                                        <xs:element name="supplyChannelPassengerReference"
+                                                                    type="com:SupplyChannelPassengerReferenceType"
+                                                                    maxOccurs="unbounded"/>
+                                                    </xs:sequence>
+                                                </xs:complexType>
+                                            </xs:element>
+                                            <xs:element name="orderNotes" minOccurs="0" maxOccurs="1">
+                                                <xs:complexType>
+                                                    <xs:sequence>
+                                                        <xs:element name="orderNote"
+                                                                    type="com:OrderNoteType"
+                                                                    maxOccurs="unbounded"/>
+                                                    </xs:sequence>
+                                                </xs:complexType>
+                                            </xs:element>
+                                            <xs:element name="confirmationInformationRequired" minOccurs="0"
+                                                        maxOccurs="1" type="xs:boolean"/>
+                                            <xs:element name="paymentCardRequiredForConfirmationInformation"
+                                                        minOccurs="0" maxOccurs="1" type="xs:boolean"/>
+
+											<xs:element name="confirmationInformationRequiredOverrides" type="com:ConfirmationInformationRequiredOverrideType" minOccurs="0"/>
+
+                                            <xs:element name="confirmationOptions" minOccurs="0" maxOccurs="1" type="com:ConfirmationOptionsType"/>
+                                            <xs:element name="selectedConfirmationOption"
+                                                        type="com:selectedConfirmationOptionType"
+                                                        minOccurs="0" maxOccurs="1"/>
+                                            <xs:element name="commercialAgentName" minOccurs="0" maxOccurs="1" type="xs:string"/>
+										</xs:sequence>
+									</xs:extension>
+								</xs:complexContent>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="paymentRequirements" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="paymentDue" type="xs:dateTime"/>
+						<xs:element name="paymentInformation">
+							<xs:simpleType>
+								<xs:restriction base="xs:string">
+									<xs:enumeration value="ANY"/>
+									<xs:enumeration value="ORDER_TOTAL"/>
+									<xs:enumeration value="BOOKING_TOTAL"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="nextDepositDue" type="xs:dateTime" minOccurs="0"/>
+						<xs:element name="minimumDepositAmount" type="com:MoneyType"/>
+						<xs:element name="acceptableFormsOfPayment">
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="formOfPayment" type="com:FormOfPaymentType"
+										maxOccurs="unbounded"/>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+                        <xs:element name="refundIsProcessedOnCancel" minOccurs="0" maxOccurs="1" type="xs:boolean"/>
+                        <xs:element name="confirmationUponAddPayment" minOccurs="0" maxOccurs="1" type="xs:boolean"/>
+                        <xs:element name="confirmationInformationRequired" minOccurs="0" maxOccurs="1" type="xs:boolean"/>
+                        <xs:element name="paymentCardRequiredForConfirmationInformation" minOccurs="0" maxOccurs="1" type="xs:boolean"/>
+                    </xs:sequence>
+				</xs:complexType>
+			</xs:element>
+            <xs:element name="serviceFeeAllowed" minOccurs="0" type="xs:boolean"/>
+			<xs:element name="financials" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="prices" minOccurs="0">
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="price" maxOccurs="unbounded">
+										<xs:complexType>
+											<xs:sequence>
+												<xs:element name="orderIDRef" type="xs:IDREF"
+												minOccurs="0"/>
+												<xs:element name="amount" type="com:MoneyType"/>
+												<xs:element name="postingDate" type="xs:date"
+												minOccurs="0"/>
+												<xs:element name="commission" minOccurs="0">
+												<xs:complexType>
+												<xs:sequence>
+												<xs:element name="amount" type="com:MoneyType"
+												minOccurs="0"/>
+												</xs:sequence>
+												<xs:attribute name="commissionable"
+												type="xs:boolean"/>
+												</xs:complexType>
+												</xs:element>
+											</xs:sequence>
+											<xs:attribute name="priceID" type="xs:ID" use="required"/>
+											<xs:attribute name="type" type="xs:string"/>
+										</xs:complexType>
+									</xs:element>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+                        <xs:element name="payments" minOccurs="0">
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="payment" maxOccurs="unbounded">
+                                        <xs:complexType>
+                                            <xs:complexContent>
+                                                <xs:extension base="com:PaymentType">
+                                                    <xs:sequence>
+                                                        <xs:element name="priceIDRef" type="xs:IDREF" minOccurs="0"/>
+                                                        <xs:element name="balanceAmount" type="com:MoneyType" minOccurs="0"/>
+                                                        <xs:element name="postingDate" type="xs:date" minOccurs="0"/>
+                                                        <xs:element name="receiptNumber" type="xs:string" minOccurs="0"/>
+                                                        <xs:element name="referenceReceiptNumber" type="xs:string" minOccurs="0"/>
+                                                    </xs:sequence>
+                                                </xs:extension>
+                                            </xs:complexContent>
+                                        </xs:complexType>
+                                    </xs:element>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                    </xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="externalIdentification" type="com:ExternalIdentificationType" minOccurs="0"/>
+			<xs:element name="customInformation" type="com:CustomInformationType" minOccurs="0"/>
+ 		</xs:sequence>
+		<xs:attribute name="recordLocator" use="required"/>
+		<xs:attribute name="status" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="BALANCED"/>
+					<xs:enumeration value="CREDIT"/>
+					<xs:enumeration value="DEBIT"/>
+					<xs:enumeration value="CLOSED"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+    <xs:complexType name="UpdateableBookingType">
+        <xs:sequence>
+            <xs:element name="passengerIdentity" type="xs:boolean"/>
+            <xs:element name="passengerAddress" type="xs:boolean"/>
+            <xs:element name="passengerContactInfo" type="xs:boolean"/>
+            <xs:element name="loyaltyCard" type="xs:boolean"/>
+            <xs:element name="travelDocument" type="xs:boolean"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="UpdateableOrderType">
+        <xs:sequence>
+            <xs:element name="ticketOption" type="xs:boolean"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="BookingNoteType">
+        <xs:sequence>
+            <xs:element name="message" type="xs:string" minOccurs="0"/>
+            <xs:element name="createdDateTime" type="xs:dateTime" minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute name="agentId" type="xs:string"/>
+        <xs:attribute name="type" type="xs:string"/><!-- AGENT_NOTE -->
+    </xs:complexType>
+    <xs:complexType name="OrderNoteType">
+        <xs:sequence>
+            <xs:element name="message" type="xs:string" minOccurs="0"/>
+            <xs:element name="createdDateTime" type="xs:dateTime" minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute name="type" type="xs:string"/>
+    </xs:complexType>
+    <xs:complexType name="AddedOrderNoteType">
+        <xs:complexContent>
+            <xs:extension base="com:OrderNoteType">
+                <xs:attribute name="orderID" type="xs:string" use="required"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+	<xs:simpleType name="CabinClassType">
+		<xs:restriction base="xs:string"/>
+	</xs:simpleType>
+	<xs:simpleType name="CancellationReasonType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="DISRUPTION"/>
+			<xs:enumeration value="FULFILLMENT_FAILURE"/>
+			<xs:enumeration value="FULL_TICKET_NOT_REQD"/>
+			<xs:enumeration value="NO_UPGRADE_AVAILABLE"/>
+			<xs:enumeration value="NO_RESERVATION_AVAILABLE"/>
+			<xs:enumeration value="PARTIAL_TICKET_NOT_REQD"/>
+			<xs:enumeration value="OTHER"/>
+		</xs:restriction>
+	</xs:simpleType>
+    <xs:simpleType name="RefundTargetType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="FORM_OF_PAYMENT"/>
+            <xs:enumeration value="VOUCHER"/>
+            <xs:enumeration value="SPLIT_FORM_OF_PAYMENT_VOUCHER"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:complexType name="BaseCancellationOptionType" abstract="true">
+        <xs:sequence>
+            <xs:element name="refundTarget" minOccurs="1" maxOccurs="1">
+                <xs:complexType>
+                    <xs:sequence minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation>These two money elements will appear only when the refundTarget contains a voucher.</xs:documentation>
+                        </xs:annotation>
+                        <xs:element name="voucherAmount" type="com:MoneyType" minOccurs="1"/>
+                        <xs:element name="voucherValue" type="com:MoneyType" minOccurs="1"/>
+                    </xs:sequence>
+                    <xs:attribute name="type" type="com:RefundTargetType" use="required"/>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="SelectedCancellationOptionType">
+        <xs:complexContent>
+            <xs:extension base="com:BaseCancellationOptionType"/>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="CancellationOptionType">
+        <xs:complexContent>
+            <xs:extension base="com:BaseCancellationOptionType">
+                <xs:sequence>
+                                	<xs:element name="penalty" minOccurs="0" maxOccurs="1">
+										<xs:complexType>
+											<xs:sequence>
+												<xs:element name="total" type="com:MoneyType" minOccurs="1" maxOccurs="1"/>
+												<xs:element name="breakdown" minOccurs="0" maxOccurs="1">
+													<xs:complexType>
+														<xs:sequence>
+															<xs:element name="component" minOccurs="0" maxOccurs="unbounded">
+																<xs:complexType>
+																	<xs:simpleContent>
+																		<xs:extension base="com:MoneyType">
+																			<xs:attribute name="type" use="required">
+																				<xs:simpleType>
+																					<xs:restriction base="xs:string">
+																						<xs:enumeration value="TICKET"/>
+																						<xs:enumeration value="RESERVATION"/>
+																						<xs:enumeration value="ACCOMMODATION"/>
+                                                                                        <xs:enumeration value="FEE"/>
+																					</xs:restriction>
+																				</xs:simpleType>
+																			</xs:attribute>
+																		</xs:extension>
+																	</xs:simpleContent>
+																</xs:complexType>
+															</xs:element>
+														</xs:sequence>
+													</xs:complexType>
+												</xs:element>
+											</xs:sequence>
+										</xs:complexType>
+									</xs:element>
+                                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+                            </xs:complexType>
+
+    <xs:complexType name="CancellationSummaryType">
+        <xs:sequence>
+            <xs:element name="cancellationOptions" minOccurs="0" maxOccurs="1">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="cancellationOption" minOccurs="1" maxOccurs="unbounded"
+                                    type="com:CancellationOptionType"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+			<xs:element name="priceReversals" minOccurs="0" maxOccurs="1">
+				<xs:complexType>
+					<xs:sequence>
+                        <xs:element name="total" type="com:MoneyType" minOccurs="1" maxOccurs="1"/>
+                        <xs:element name="breakdown" minOccurs="0" maxOccurs="1">
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="component" maxOccurs="unbounded">
+                                        <xs:complexType>
+                                            <xs:sequence>
+                                                <xs:element name="amount" type="com:MoneyType"/>
+                                            </xs:sequence>
+                                            <xs:attribute name="type" type="xs:string"/>
+                                        </xs:complexType>
+                                    </xs:element>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                    </xs:sequence>
+				</xs:complexType>
+			</xs:element>
+        </xs:sequence>
+        <xs:attribute name="isCancellable" use="required" type="xs:boolean"/>
+        <xs:attribute name="isPartiallyCancellable" use="optional" type="xs:boolean"/>
+    </xs:complexType>
+    <xs:complexType name="CarrierType">
+		<xs:simpleContent>
+			<xs:extension base="xs:string"/>
+		</xs:simpleContent>
+	</xs:complexType>
+	<xs:simpleType name="ChannelType">
+		<xs:restriction base="xs:string">
+			<xs:minLength value="1"/>
+			<xs:maxLength value="10"/>
+			<xs:pattern value="[a-zA-Z0-9]+"/>
+		</xs:restriction>
+	</xs:simpleType>
+    <xs:complexType name="SupplierEquipmentTypeType">
+        <xs:simpleContent>
+            <xs:extension base="xs:string"/>
+        </xs:simpleContent>
+    </xs:complexType>
+	<xs:simpleType name="ChannelCodeType">
+		<xs:restriction base="xs:string">
+			<xs:minLength value="1"/>
+			<xs:maxLength value="10"/>
+			<xs:pattern value="[a-zA-Z0-9]+"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="CheckType">
+		<xs:sequence>
+			<xs:element name="number" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="CompanyCodeType">
+		<xs:restriction base="xs:string">
+			<xs:minLength value="1"/>
+			<xs:maxLength value="10"/>
+			<xs:pattern value="[a-zA-Z0-9]+"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="ContextType">
+		<xs:annotation>
+			<xs:documentation>Context defines the parameters of the API request.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="distributorCode" type="com:DistributorCodeType"/>
+			<xs:element name="pointOfSaleCode" type="com:PointOfSaleCodeType"/>
+			<xs:choice>
+				<xs:annotation>
+					<xs:documentation>channel is deprecated. Please use channelCode.</xs:documentation>
+				</xs:annotation>
+				<xs:element name="channel" type="com:ChannelType"/>
+				<xs:element name="channelCode" type="com:ChannelCodeType"/>
+			</xs:choice>
+			<xs:element name="agencyCode" type="com:AgencyCodeType" minOccurs="0"/>
+			<xs:element name="companyCode" type="com:CompanyCodeType" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="CouponType" abstract="true">
+		<xs:sequence>
+			<xs:element name="couponNumber" type="xs:string" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="CreditCardType">
+		<xs:complexContent>
+			<xs:extension base="com:BaseCreditCardType">
+				<xs:sequence>
+					<xs:element name="paymentProcessorInfo" type="com:PaymentProcessorInfoType"
+						minOccurs="0"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="CustomInformationType">
+		<xs:sequence>
+			<xs:element name="customInformationPair" minOccurs="1" maxOccurs="unbounded">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="key" type="xs:string"/>
+						<xs:element name="value" type="xs:string"/>
+						<!-- Element is part of both request and response spec, hence created time has to be optional, 
+						  even though it's required in the data model -->
+						<xs:element name="createdDateTime" type="xs:dateTime" minOccurs="0"/>
+						<xs:element name="updatedDateTime" type="xs:dateTime" minOccurs="0"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="CustomerContactType">
+		<xs:sequence>
+			<xs:element name="contactType">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="BUSINESS"/>
+						<xs:enumeration value="HOME"/>
+                        <xs:enumeration value="MOBILE"/>
+						<xs:enumeration value="AGENCY"/>
+						<xs:enumeration value="HOTEL"/>
+						<xs:enumeration value="COMMERCIAL"/>
+						<xs:enumeration value="DESTINATION"/>
+						<xs:enumeration value="UNKNOWN"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="contactMedium">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="EMAIL"/>
+						<xs:enumeration value="PHONE"/>
+						<xs:enumeration value="FAX"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<!-- Actual Phone number, email address, etc...-->
+			<xs:element name="contactInfo" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="CustomerType">
+		<xs:sequence>
+			<xs:element name="title" type="xs:string" minOccurs="0"/>
+			<xs:element name="nameFirst" type="com:NameFirstType" minOccurs="0"/>
+			<xs:element name="nameMiddle" type="xs:string" minOccurs="0"/>
+			<xs:element name="nameLast" type="com:NameLastType" minOccurs="0"/>
+			<xs:element name="suffix" type="xs:string" minOccurs="0"/>
+			<xs:element name="dob" type="xs:date" minOccurs="0"/>
+			<xs:element name="gender" type="com:GenderType" minOccurs="0"/>
+			<xs:element name="residenceInformation" type="com:ResidenceInformationType" minOccurs="0"/>
+			<xs:element name="address" type="com:AddressType" minOccurs="0"/>
+			<xs:element name="contactInformation" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="contact" type="com:CustomerContactType"
+							maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="ageAtTimeOfTravel" type="xs:int" minOccurs="0"/>
+            <xs:element name="loyaltyCards" minOccurs="0">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="loyaltyCard" type="com:PassengerLoyaltyCardType" maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="DateTimeWindowType">
+		<xs:sequence>
+			<xs:element name="date" type="xs:date"/>
+			<xs:element name="time" minOccurs="0">
+				<xs:complexType>
+					<xs:simpleContent>
+						<xs:extension base="xs:time">
+							<xs:attribute name="hoursBeforeOffset" type="xs:int"/>
+							<xs:attribute name="hoursAfterOffset" type="xs:int"/>
+						</xs:extension>
+					</xs:simpleContent>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="DebitCardType">
+		<xs:complexContent>
+			<xs:extension base="com:BaseDebitCardType">
+				<xs:sequence>
+					<xs:element name="paymentProcessorInfo" type="com:PaymentProcessorInfoType"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="DistanceType">
+		<xs:simpleContent>
+			<xs:extension base="xs:double">
+				<xs:attribute name="unitOfMeasure" use="required">
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:enumeration value="MILES"/>
+							<xs:enumeration value="KILOMETERS"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:attribute>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<xs:simpleType name="DistributorCodeType">
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="10"/>
+			<xs:minLength value="1"/>
+			<xs:pattern value="[a-zA-Z0-9]+"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="NameFirstType">
+		<xs:restriction base="xs:string">
+			<xs:minLength value="0"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="NameLastType">
+		<xs:restriction base="xs:string">
+			<xs:minLength value="0"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="ECheckType">
+		<xs:complexContent>
+			<xs:extension base="com:BaseECheckType">
+				<xs:sequence>
+					<xs:element name="paymentProcessorInfo" type="com:PaymentProcessorInfoType"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="EquipmentTypeType">
+		<xs:simpleContent>
+			<xs:extension base="xs:string">
+				<xs:attribute name="code" use="required">
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:enumeration value="HSP"/>
+							<xs:enumeration value="ICY"/>
+							<xs:enumeration value="BLR"/>
+							<xs:enumeration value="APT"/>
+							<xs:enumeration value="CMT"/>
+							<xs:enumeration value="BUS"/>
+                            <xs:enumeration value="XBU"/>
+							<xs:enumeration value="MCT"/>
+							<xs:enumeration value="NIT"/>
+							<xs:enumeration value="NAT"/>
+							<xs:enumeration value="FRY"/>
+							<xs:enumeration value="PED"/>
+                            <xs:enumeration value="STR"/>
+							<xs:enumeration value="TAX"/>
+							<xs:enumeration value="TRM"/>
+							<xs:enumeration value="PFC"/>
+							<xs:enumeration value="HOV"/>
+							<xs:enumeration value="TRS"/>
+							<xs:enumeration value="UNK"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:attribute>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<xs:simpleType name="EquipmentTypeDescriptionType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="High-speed"/>
+			<xs:enumeration value="Inter-City"/>
+			<xs:enumeration value="Branch-Line/Regional"/>
+			<xs:enumeration value="Airport"/>
+			<xs:enumeration value="Commuter"/>
+			<xs:enumeration value="Bus"/>
+            <xs:enumeration value="Express Bus"/>
+			<xs:enumeration value="Metro/City-Transit"/>
+			<xs:enumeration value="Night-Train"/>
+			<xs:enumeration value="Named-Train"/>
+			<xs:enumeration value="Ferry"/>
+			<xs:enumeration value="Pedestrian"/>
+            <xs:enumeration value="Self-Transfer"/>
+			<xs:enumeration value="Taxi"/>
+			<xs:enumeration value="Tram"/>
+			<xs:enumeration value="Platform Change"/>
+			<xs:enumeration value="Hovercraft"/>
+			<xs:enumeration value="Transfer"/>
+			<xs:enumeration value="Unknown"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="ExternalIdentificationType">
+		<xs:sequence>
+			<xs:element name="referenceNumber" type="com:IdentificationType" minOccurs="0"/>
+			<xs:element name="purchaseOrderNumber" type="com:IdentificationType" minOccurs="0"/>
+			<xs:element name="customerNumber" type="com:IdentificationType" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="FareClassType">
+		<xs:restriction base="xs:string"/>
+	</xs:simpleType>
+	<xs:simpleType name="FareDisplayNameType">
+		<xs:restriction base="xs:string"/>
+	</xs:simpleType>
+	<xs:complexType name="FareCodeType">
+		<xs:sequence>
+			<xs:element name="serviceClass" type="com:ServiceClassType"/>
+			<xs:element name="travelSegmentIDRef" type="xs:IDREF" minOccurs="0"/>
+			<xs:element name="cabinClass" type="com:CabinClassType" minOccurs="0"/>
+			<xs:element name="rewardsEligible" type="com:YesNoType" minOccurs="0"/>
+			<xs:element name="fareClass" type="com:FareClassType" minOccurs="0"/>
+			<xs:element name="fareDisplayName" type="com:FareDisplayNameType" minOccurs="0"/>
+			<xs:element name="openReturn" type="com:YesNoType" minOccurs="0"/>
+			<xs:element name="reservable" type="com:ReservableType" minOccurs="0"/>
+			<xs:element name="reservationRequested" type="com:YesNoType" minOccurs="0"/>
+            <xs:element name="fareExpirationDateTime" type="xs:dateTime" minOccurs="0"/>
+            <xs:element name="seatAssignment" type="com:SeatAssignmentType" minOccurs="0"/>
+            <xs:element name="seats" type="com:SeatLocationListType" minOccurs="0"/>
+			<xs:element minOccurs="0" maxOccurs="1" name="seatPreferences">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="seatPreference" type="com:SeatPreferenceType" minOccurs="1" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+            <xs:element name="amenities" minOccurs="0">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="amenity" type="com:AmenityType" maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="services" minOccurs="0">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="service" maxOccurs="unbounded">
+                            <xs:complexType>
+                                <xs:simpleContent>
+                                    <xs:extension base="xs:string">
+                                        <xs:attribute name="category" use="required" type="xs:string"/>
+                                    </xs:extension>
+                                </xs:simpleContent>
+                            </xs:complexType>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="fareApplicabilities" minOccurs="0">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="fareApplicability" minOccurs="1" maxOccurs="unbounded">
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="fareApplicabilityText" type="xs:string" minOccurs="0"/>
+                                </xs:sequence>
+                                <xs:attribute name="outbound" type="com:FareApplicabilityRestrictionType"/>
+                                <xs:attribute name="return" type="com:FareApplicabilityRestrictionType"/>
+                                <xs:attribute name="type" type="com:FareApplicabilityBasisType"/>
+                            </xs:complexType>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+			<xs:element name="optionalPricesRequested" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="optionalPriceIDRef" type="xs:IDREF" minOccurs="1" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="code" use="required"/>
+	</xs:complexType>
+	<xs:complexType name="PassFareCodeType">
+		<xs:sequence>
+			<xs:element name="serviceClass" type="com:ServiceClassType"/>
+			<xs:element name="cabinClass" type="com:CabinClassType" minOccurs="0"/>
+			<xs:element name="rewardsEligible" type="com:YesNoType" minOccurs="0"/>
+			<xs:element name="fareClass" type="com:FareClassType" minOccurs="0"/>
+			<xs:element name="fareDisplayName" type="com:FareDisplayNameType" minOccurs="0"/>
+            <xs:element name="services" minOccurs="0">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="service" maxOccurs="unbounded">
+                            <xs:complexType>
+                                <xs:simpleContent>
+                                    <xs:extension base="xs:string">
+                                        <xs:attribute name="category" use="required" type="xs:string"/>
+                                    </xs:extension>
+                                </xs:simpleContent>
+                            </xs:complexType>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="fareApplicabilities" minOccurs="0">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="fareApplicability" minOccurs="1" maxOccurs="unbounded">
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="fareApplicabilityText" type="xs:string" minOccurs="0"/>
+                                </xs:sequence>
+                                <xs:attribute name="outbound" type="com:FareApplicabilityRestrictionType"/>
+                                <xs:attribute name="return" type="com:FareApplicabilityRestrictionType"/>
+                                <xs:attribute name="type" type="com:FareApplicabilityBasisType"/>
+                            </xs:complexType>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+			<xs:element name="optionalPricesRequested" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="optionalPriceIDRef" type="xs:IDREF" minOccurs="1" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="code" use="required"/>
+	</xs:complexType>
+    <xs:simpleType name="FareApplicabilityBasisType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="SCHEDULE"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="FareApplicabilityRestrictionType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="OPEN"/>
+            <xs:enumeration value="SEMI-OPEN"/>
+            <xs:enumeration value="RESTRICTED"/>
+        </xs:restriction>
+    </xs:simpleType>
+	<xs:complexType name="FareQualifierType">
+		<xs:sequence>
+			<xs:element name="program" type="xs:string"/>
+			<xs:element name="identifier" type="xs:string" minOccurs="0"/>
+            <xs:element name="authorizationNumbers" type="com:AuthorizationNumbersType" minOccurs="0"/>
+            <xs:element name="passengerReferences" minOccurs="0">
+                <xs:complexType>
+                    <xs:sequence>
+                      <xs:element name="passengerIDRef" type="xs:IDREF" maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+		</xs:sequence>
+		<xs:attribute name="type" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="CORPORATE"/>
+					<xs:enumeration value="DISCOUNT_CARD"/>
+					<xs:enumeration value="PROMOTION"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="fareQualifierID" type="xs:ID"/>
+		<xs:attribute name="authorizationNumberRequired" type="xs:boolean"/>
+		<xs:attribute name="identifierRequired" type="xs:boolean"/>
+		<xs:attribute name="cardsUsed" type="xs:integer"/>
+	</xs:complexType>
+    <xs:complexType name="AuthorizationNumbersType">
+        <xs:sequence>
+            <xs:element name="authorizationNumber" maxOccurs="unbounded">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="passengerIDRef" type="xs:IDREF" maxOccurs="unbounded"/>
+                    </xs:sequence>
+                    <xs:attribute name="value" use="required" type="xs:string"/>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+	<xs:complexType name="FareTerminalPointType">
+		<xs:simpleContent>
+			<xs:extension base="com:TravelPointType">
+				<xs:attribute name="unknownFareMapping" use="optional" type="xs:boolean"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<xs:complexType name="FeeType">
+		<xs:sequence>
+			<xs:element name="description" type="xs:string"/>
+			<xs:element name="amount" type="com:MoneyType"/>
+			<xs:element name="feeType" type="com:NonValidatedServiceFeeType"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="NonValidatedServiceFeeType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="CC_Surcharge_Fee_Assessment"/>
+			<xs:enumeration value="Misc_Fee_Assessment"/>
+			<xs:enumeration value="Misc_Agency_Service_Fee_Assessment"/>
+			<xs:enumeration value="Misc_Distributor_Service_Fee_Assessment"/>
+			<xs:enumeration value="Misc_Company_Service_Fee_Assessment"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="FeesType">
+		<xs:sequence>
+			<xs:element name="fee" type="com:FeeType" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="FormOfPaymentType">
+		<xs:annotation>
+			<xs:documentation>Acceptable Values for 'CC' type: AX, CA, VI, DI, UA, MC</xs:documentation>
+			<xs:documentation>Acceptable Values for 'DB' type: DS, DV, DM</xs:documentation>
+		</xs:annotation>
+		<xs:simpleContent>
+			<xs:extension base="xs:string">
+				<xs:attribute name="type">
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:enumeration value="CC"/>
+							<xs:enumeration value="CK"/>
+							<xs:enumeration value="OA"/>
+							<xs:enumeration value="DB"/>
+							<xs:enumeration value="VO"/>
+							<xs:enumeration value="EK"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:attribute>
+				<xs:attribute name="authenticatePayerRequired" type="xs:boolean" use="optional"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<xs:simpleType name="GenderType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="MALE"/>
+			<xs:enumeration value="FEMALE"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="HoldExpirationType">
+		<xs:restriction base="xs:dateTime"/>
+	</xs:simpleType>
+	<xs:simpleType name="IdentificationType">
+		<xs:restriction base="xs:string">
+			<xs:minLength value="1"/>
+			<xs:maxLength value="25"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="ISOCountryCodeType">
+		<xs:annotation>
+			<xs:documentation>An ISO 3166 country code</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:length value="2"/>
+			<xs:pattern value="[a-zA-Z]+"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+    <xs:simpleType name="ISOCountryCode3Type">
+        <xs:annotation>
+            <xs:documentation>An ISO 3166 country code</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:length value="3"/>
+            <xs:pattern value="[a-zA-Z]+"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:complexType name="CompatiblePricesType">
+        <xs:sequence>
+            <xs:element name="compatiblePriceIDRef" type="xs:IDREF" minOccurs="1" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+	<xs:complexType name="LegReferencesType">
+		<xs:sequence>
+			<xs:choice maxOccurs="unbounded">
+				<xs:element name="legIDRef" type="xs:IDREF"/>
+				<xs:element name="legSolutionIDRef" type="xs:IDREF"/>
+			</xs:choice>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="LegSolutionType">
+		<xs:sequence>
+			<xs:element name="numberOfConnections" type="xs:int" minOccurs="0"/>
+			<xs:element name="serviceAlerts" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="serviceAlert" type="com:ServiceAlertType"
+							maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="travelSegments">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="travelSegment" type="com:TravelSegmentType"
+							maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="overtakenJourney" type="xs:boolean" minOccurs="0"/>
+            <xs:element name="duration" type="xs:duration" minOccurs="0"/>
+			<xs:element minOccurs="0" name="routingRestrictions" type="com:RoutingRestrictionsType"/>
+            <xs:element name="passengerInformationRequired" minOccurs="0">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="passengerInformation" type="com:PassengerInformationType" maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="availableSeatPreferences" minOccurs="0">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="availableSeatPreference" type="com:AvailableSeatPreferenceType" maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="loyaltyCards" minOccurs="0">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="loyaltyCard" type="com:LoyaltyCardType" maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+			<xs:element name="revisions" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="revision" type="com:RevisionType" minOccurs="1" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="legSolutionID" type="xs:ID" use="required"/>
+	</xs:complexType>
+	<xs:complexType name="LegSolutionsType">
+		<xs:sequence>
+			<xs:element name="legSolution" type="com:LegSolutionType" minOccurs="0"
+				maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="LegType">
+		<xs:sequence>
+			<xs:element name="originTravelPoint" type="com:TravelPointType"/>
+			<xs:element name="destinationTravelPoint" type="com:TravelPointType"/>
+			<xs:element name="legSolutions" type="com:LegSolutionsType"/>
+		</xs:sequence>
+		<xs:attribute name="legID" type="xs:ID" use="required"/>
+	</xs:complexType>
+	<xs:complexType name="MoneyType">
+		<xs:simpleContent>
+			<xs:extension base="com:MoneyValueType">
+				<xs:attribute name="currency" type="xs:string"/>
+				<xs:attribute name="currencySymbol" type="xs:string"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+
+	<xs:complexType name="RefundableMoneyType">
+		<xs:complexContent>
+			<xs:extension base="com:MoneyType">
+				<xs:attribute name="isRefundable" type="xs:boolean"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+    <xs:complexType name="TotalPriceType">
+        <xs:simpleContent>
+            <xs:extension base="com:MoneyType">
+                <xs:attribute name="isEstimated" type="xs:boolean"/>
+                <xs:attribute name="requiresDiscountCode" type="xs:boolean"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+	<xs:complexType name="PriceType">
+		<xs:simpleContent>
+			<xs:extension base="com:MoneyType">
+				<xs:attribute name="type" use="required">
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:enumeration value="TICKET"/>
+							<xs:enumeration value="RESERVATION"/>
+							<xs:enumeration value="TICKETED_RES"/>
+                            <xs:enumeration value="TRAVEL_PASS"/>
+                            <xs:enumeration value="ACCOMMODATION"/>
+							<xs:enumeration value="TAX"/>
+							<xs:enumeration value="TAX_NATIONAL"/>
+							<xs:enumeration value="TAX_STATEPROVINCE"/>
+							<xs:enumeration value="FEE"/>
+							<xs:enumeration value="CORP_DISCOUNT"/>
+							<xs:enumeration value="VAT"/>
+							<xs:enumeration value="VAT_TICKET"/>
+							<xs:enumeration value="VAT_RESERVATION"/>
+							<xs:enumeration value="VAT_FEE"/>
+							<xs:enumeration value="VAT_ONBOARD_SERVICES"/>
+                            <xs:enumeration value="ONBOARD_SERVICES"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:attribute>
+                <xs:attribute name="isEstimated" type="xs:boolean"/>
+                <xs:attribute name="description" type="xs:string"/>
+                <xs:attribute name="requiresDiscountCode" type="xs:boolean"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+    <xs:complexType name="OptionalPriceType">
+        <xs:sequence>
+            <xs:element name="price">
+                <xs:complexType>
+                    <xs:simpleContent>
+                        <xs:extension base="com:MoneyType">
+                            <xs:attribute name="type" use="required">
+                                <xs:simpleType>
+                                    <xs:restriction base="xs:string">
+                                        <xs:enumeration value="RESERVATION"/>
+                                    	<xs:enumeration value="ACCOMMODATION"/>
+                                    	<xs:enumeration value="AMENITY"/>
+                                    	<xs:enumeration value="LOCAL_SERVICE"/>
+                                        <xs:enumeration value="ONBOARD_SERVICES"/>
+                                    </xs:restriction>
+                                </xs:simpleType>
+                            </xs:attribute>
+                        </xs:extension>
+                    </xs:simpleContent>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="description" type="xs:string" minOccurs="0"/>
+            <xs:element name="applicableTravelSegments" minOccurs="0">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="travelSegmentIDRef" type="xs:IDREF" minOccurs="1" maxOccurs="unbounded"/>
+                    </xs:sequence>
+                    <xs:attribute name="minQuantity" type="xs:integer"/>
+                    <xs:attribute name="maxQuantity" type="xs:integer"/>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="rules" minOccurs="0" type="com:RulesType"/>
+        	<xs:element name="fareCodes" minOccurs="0" maxOccurs="1">
+        		<xs:complexType>
+        			<xs:sequence>
+        				<xs:element name="fareCode" type="com:OptionalPriceFareCodeType" minOccurs="1" maxOccurs="unbounded"/>
+        			</xs:sequence>
+        		</xs:complexType>
+        	</xs:element>
+        	<xs:element name="ticketingOptionsAvailable" type="com:TicketingOptionsAvailableType" minOccurs="0" maxOccurs="1"/>
+        	<xs:element name="consumptionRules" type="com:ConsumptionRulesType" minOccurs="0" maxOccurs="1"/>
+        	<xs:element name="maximumBookableQuantity" type="xs:int" minOccurs="0" maxOccurs="1"/>
+        </xs:sequence>
+    	<xs:attribute name="optionalPriceID" type="xs:ID" use="optional"/>
+    	<xs:attribute name="quantity" type="xs:int" use="optional"/>
+        <xs:attribute name="category">
+            <xs:simpleType>
+                <xs:restriction base="xs:string">
+                    <xs:enumeration value="SEAT_RESERVATION"/>
+                	<xs:enumeration value="ACCOMMODATION"/>
+                	<xs:enumeration value="MEAL"/>
+                	<xs:enumeration value="INTERNET"/>
+                    <xs:enumeration value="LOCAL_TRANSIT"/>
+                    <xs:enumeration value="OFFICE_SPACE"/>
+                </xs:restriction>
+            </xs:simpleType>
+        </xs:attribute>
+    </xs:complexType>
+	<xs:complexType name="OptionalPriceFareCodeType">
+		<xs:annotation>
+			<xs:documentation>
+				We have to add OptionalPriceFareCodeType instead of just reusing FareCodeType. If we made the changes needed for optional prices
+				to FareCodeType, it would no longer be backwards compatible. Once we go to the next major version of the API,
+				we can coalesce FareCodeType and OptionalPriceFareCodeType then.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="serviceClass" type="com:ServiceClassType"  minOccurs="0"/>
+			<xs:element name="travelSegmentIDRef" type="xs:IDREF"  minOccurs="0"/>
+			<xs:element name="cabinClass" type="com:CabinClassType" minOccurs="0"/>
+			<xs:element name="fareClass" type="com:FareClassType" />
+			<xs:element name="fareDisplayName" type="com:FareDisplayNameType" minOccurs="0"/>
+		</xs:sequence>
+		<xs:attribute name="code" use="required"/>
+	</xs:complexType>
+ 	<xs:complexType name="ConsumptionRulesType">
+		<xs:sequence>
+			<xs:element name="ageBreakConsumptionRule" type="com:AgeBreakConsumptionRuleType" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="totalPassengersConsumptionRule" type="com:TotalPassengersConsumptionRuleType" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="travelCardZoneConsumptionRule" type="com:TravelCardZoneConsumptionRuleType" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ConsumptionRuleType" abstract="true">
+        <xs:attribute name="minQuantity" type="xs:int" use="required"/>
+        <xs:attribute name="maxQuantity" type="xs:int" use="required"/>
+    </xs:complexType>
+	<xs:complexType name="AgeBreakConsumptionRuleType">
+		<xs:complexContent>
+			<xs:extension base="com:ConsumptionRuleType">
+				<xs:sequence>
+					<xs:element name="minAge" type="xs:int" minOccurs="0" maxOccurs="1"/>
+					<xs:element name="maxAge" type="xs:int" minOccurs="0" maxOccurs="1"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="TotalPassengersConsumptionRuleType">
+        <xs:complexContent>
+            <xs:extension base="com:ConsumptionRuleType" />
+        </xs:complexContent>
+	</xs:complexType>
+    <xs:complexType name="TravelCardZoneConsumptionRuleType">
+        <xs:sequence>
+            <xs:element name="travelCardZone" type="xs:string" minOccurs="1" maxOccurs="1"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="CostType"> <!-- TODO consider merging PriceType and CostType -->
+        <xs:simpleContent>
+            <xs:extension base="com:MoneyType">
+                <xs:attribute name="type" use="required">
+                    <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                            <xs:enumeration value="TICKET"/>
+                            <xs:enumeration value="TRAVEL_PASS"/>
+                            <xs:enumeration value="RESERVATION"/>
+                            <xs:enumeration value="TICKETED_RES"/>
+                            <xs:enumeration value="ACCOMMODATION"/>
+                            <xs:enumeration value="TAX"/>
+                            <xs:enumeration value="TAX_NATIONAL"/>
+                            <xs:enumeration value="TAX_STATEPROVINCE"/>
+                            <xs:enumeration value="FEE"/>
+                            <xs:enumeration value="VAT"/>
+                            <xs:enumeration value="ONBOARD_SERVICES"/>
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:attribute>
+                <xs:attribute name="isEstimated" type="xs:boolean"/>
+                <xs:attribute name="description" type="xs:string"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+    <xs:complexType name="CommissionType">
+        <xs:simpleContent>
+            <xs:extension base="com:MoneyType">
+                <xs:attribute name="type" use="required">
+                    <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                            <xs:enumeration value="SUPPLIER"/>
+                            <xs:enumeration value="DISTRIBUTOR"/>
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:attribute>
+                <xs:attribute name="isEstimated" type="xs:boolean"/>
+                <xs:attribute name="description" type="xs:string"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+	<xs:simpleType name="MoneyValueType">
+		<xs:restriction base="xs:decimal">
+			<xs:fractionDigits value="2"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="OnAccountType">
+		<xs:sequence>
+			<xs:element name="number" type="xs:string"/>
+			<xs:element name="validationCode" type="xs:string"/>
+			<xs:element name="accountName" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+
+    <!-- Update usage of ShippingInformationType where shippingName and shippingAddress are used during next major schema revision.-->
+    <xs:complexType name="ShippingInformationType">
+        <xs:sequence>
+            <xs:element name="shippingName" type="xs:string" minOccurs="0"/>
+            <xs:element name="shippingAddress" type="com:AddressType" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+	<xs:complexType name="OrderType">
+		<xs:sequence>
+			<xs:element name="supplyChannelRecordLocator" type="com:AnorakRecordLocatorType" minOccurs="0"/>
+            <xs:element name="supplierLocator" type="com:AnorakRecordLocatorType" minOccurs="0"/>
+			<xs:element name="dateBooked" type="xs:date"/>
+            <xs:element name="dateCancelled" type="xs:dateTime" minOccurs="0"/>
+			<xs:element name="serviceAlerts" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="serviceAlert" type="com:ServiceAlertType"
+							maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="holdExpiration" type="com:HoldExpirationType"/>
+			<xs:element name="fulfillmentInformation" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="selectedTicketingOption" type="com:TicketingOptionType"
+							minOccurs="0"/>
+						<xs:element name="shippingName" type="xs:string" minOccurs="0"/>
+						<xs:element name="shippingAddress" type="com:AddressType" minOccurs="0"/>
+						<xs:element name="valueDocument" type="com:ValueDocumentType" minOccurs="0"/>
+                        <xs:element name="phoneNumber" type="com:FulfillmentPhoneNumberType" minOccurs="0" />
+                    </xs:sequence>
+				</xs:complexType>
+			</xs:element>
+
+			<xs:element name="refundEligibility">
+                <xs:annotation>
+                    <xs:documentation>refundEligibility is deprecated. Please use cancellationSummary instead.</xs:documentation>
+                </xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="penalty" minOccurs="0" type="com:MoneyType"/>
+                        <xs:element name="penaltyBreakdown" minOccurs="0">
+                             <xs:complexType>
+                                 <xs:sequence>
+                                     <xs:element name="penaltyItem" minOccurs="1" maxOccurs="unbounded">
+                                         <xs:complexType>
+                                             <xs:simpleContent>
+                                                 <xs:extension base="com:MoneyType">
+                                                     <xs:attribute name="type" use="required">
+                                                         <xs:simpleType>
+                                                             <xs:restriction base="xs:string">
+                                                                 <xs:enumeration value="TICKET"/>
+                                                                 <xs:enumeration value="TICKETED_RES"/>
+                                                                 <xs:enumeration value="RESERVATION"/>
+                                                                 <xs:enumeration value="FEE"/>
+                                                             </xs:restriction>
+                                                         </xs:simpleType>
+                                                     </xs:attribute>
+                                                 </xs:extension>
+                                             </xs:simpleContent>
+                                         </xs:complexType>
+                                     </xs:element>
+                                 </xs:sequence>
+                             </xs:complexType>
+                         </xs:element>
+					</xs:sequence>
+					<xs:attribute name="eligible" use="required" type="xs:boolean"/>
+                    <xs:attribute name="cancelRequiredForRefund" use="optional" type="xs:boolean"/>
+				</xs:complexType>
+			</xs:element>
+
+            <xs:element name="cancellationSummary" type="com:CancellationSummaryType" minOccurs="0"/>
+
+			<xs:element name="rules" minOccurs="0" type="com:RulesType"/>
+
+			<xs:element name="shipmentTrackingInformation" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="shipmentTracking" minOccurs="1" type="com:ShipmentTrackingType" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+
+			<xs:element name="cancellationReason" type="com:CancellationReasonType" minOccurs="0" maxOccurs="1"/>
+
+			<xs:element name="internalCancellationReason" type="xs:string" minOccurs="0" maxOccurs="1"/>
+
+            <xs:element name="availableTicketLanguages" minOccurs="0" maxOccurs="1">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="language" type="xs:string" minOccurs="1" maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+
+            <xs:element name="isInventoryCanceled" type="xs:boolean" minOccurs="0" maxOccurs="1"/>
+		</xs:sequence>
+		<xs:attribute name="orderID" type="xs:ID" use="required"/>
+		<xs:attribute name="status" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="PENDING"/>
+					<xs:enumeration value="BOOKED"/>
+					<xs:enumeration value="CONFIRMED"/>
+					<xs:enumeration value="TICKETED"/>
+					<xs:enumeration value="ABANDONED"/>
+					<xs:enumeration value="RELEASED"/>
+					<xs:enumeration value="CANCELED"/>
+					<xs:enumeration value="RETURNED"/>
+                    <xs:enumeration value="WITHDRAWN"/>
+					<xs:enumeration value="INVALID"/>
+                    <xs:enumeration value="PRINTING"/>
+                    <xs:enumeration value="REPLACED"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="originalOrderID" type="xs:IDREF"/>
+	</xs:complexType>
+	<xs:complexType name="PassengerFareQualifierType">
+		<xs:sequence>
+			<xs:element name="program" type="xs:string"/>
+			<xs:element name="identifier" type="xs:string" minOccurs="0"/>
+		</xs:sequence>
+		<xs:attribute name="type" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="LOYALTY"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+	<xs:complexType name="PassengerSpecType">
+		<xs:sequence>
+			<xs:choice>
+				<xs:element name="age" type="xs:int"/>
+				<xs:element name="dateOfBirth" type="xs:date"/>
+			</xs:choice>
+			<xs:element name="residenceInformation" type="com:ResidenceInformationType"
+				minOccurs="0"/>
+		</xs:sequence>
+		<xs:attribute name="passengerSpecID" type="xs:ID"/>
+	</xs:complexType>
+	<xs:complexType name="PassengerType">
+		<xs:complexContent>
+			<xs:extension base="com:CustomerType">
+				<xs:sequence>
+					<xs:element name="travelDocuments" minOccurs="0">
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="travelDocument" type="com:TravelDocumentType"
+									maxOccurs="unbounded"/>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+					<xs:element name="orderReferences" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Will only be returned if the includeOrderDetails flag is true in the request </xs:documentation>
+						</xs:annotation>
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="orderIDRef" type="xs:IDREF" maxOccurs="unbounded"
+								/>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+                    <xs:element name="customerReference" minOccurs="0">
+                        <xs:annotation>
+                            <xs:documentation>Will only be returned if the includeOrderDetails flag is true in the request </xs:documentation>
+                  		</xs:annotation>
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element name="crmNumber" type="xs:string" minOccurs="0"/>
+                                <xs:element name="username" type="xs:string" minOccurs="0"/>
+                                <xs:element name="customerNumber" type="xs:string" minOccurs="0"/>
+                                <xs:element name="customerSource" type="xs:string" minOccurs="0"/>
+                                <xs:element name="campaignReference" type="xs:string" minOccurs="0"/>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                    <xs:element name="customInformation" minOccurs="0" type="com:CustomInformationType">
+                        <xs:annotation>
+                            <xs:documentation>Element is only valid for update booking requests and retrieve booking responses.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+				</xs:sequence>
+				<xs:attribute name="passengerID" type="xs:ID">
+					<xs:annotation>
+						<xs:documentation>This attribute should be required but it will remain optional for backwards compatibility.</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="PaymentProcessorInfoType">
+		<xs:sequence>
+			<xs:element name="approvalNumber" type="xs:string" minOccurs="0"/>
+			<xs:element name="paymentProcessor" type="xs:string"/>
+			<xs:element name="doingBusinessAs" type="xs:string" minOccurs="0"/>
+			<xs:element name="error" minOccurs="0">
+				<xs:complexType>
+					<xs:simpleContent>
+						<xs:extension base="xs:string">
+							<xs:attribute name="code"/>
+						</xs:extension>
+					</xs:simpleContent>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="descriptiveBillingInformationCollection" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="descriptiveBillingInformation" type="xs:string"
+							minOccurs="0" maxOccurs="10"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="transactionCode" type="xs:string" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="PaymentType">
+		<xs:sequence>
+			<xs:element name="formOfPayment" type="com:FormOfPaymentType"/>
+			<xs:choice minOccurs="0">
+				<xs:element name="creditCard" type="com:CreditCardType"/>
+				<xs:element name="check" type="com:CheckType"/>
+				<xs:element name="onAccount" type="com:OnAccountType"/>
+				<xs:element name="debitCard" type="com:DebitCardType"/>
+				<xs:element name="voucher" type="com:VoucherType"/>
+				<xs:element name="eCheck" type="com:ECheckType"/>
+			</xs:choice>
+			<xs:element name="amount" type="com:MoneyType"/>
+		</xs:sequence>
+		<xs:attribute name="type" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="PAYMENT"/>
+					<xs:enumeration value="PAYMENT_FAILED"/>
+					<xs:enumeration value="DEPOSIT"/>
+					<xs:enumeration value="REFUND"/>
+					<xs:enumeration value="REFUND_FAILED"/>
+					<xs:enumeration value="CREDIT"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+	<xs:simpleType name="PointOfSaleCodeType">
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="2"/>
+			<xs:minLength value="2"/>
+			<xs:pattern value="[A-Z][A-Z]"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="PointToPointPriceType">
+		<xs:sequence>
+			<xs:element name="totalPrice" type="com:TotalPriceType"/>
+			<xs:element name="ticketableFares">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="ticketableFare" type="com:TicketableFareType"
+							maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="legReferences" type="com:LegReferencesType" minOccurs="0"/>
+			<xs:element name="fareMerchandisingRank" type="xs:int" minOccurs="0"/>
+			<xs:element name="holdExpiration" type="com:HoldExpirationType" minOccurs="0"/>
+            <xs:element name="compatiblePrices" type="com:CompatiblePricesType" minOccurs="0"/>
+		</xs:sequence>
+		<xs:attribute name="priceID" type="xs:ID" use="required"/>
+        <xs:attribute name="availabilityCheckBypassed" type="xs:boolean"/>
+	</xs:complexType>
+
+
+	<xs:complexType name="QueryTravelPointPairPassType">
+		<xs:complexContent>
+			<xs:extension base="com:TravelPointPairDateType">
+				<xs:sequence>
+                 <xs:element name="restrictions" type="com:BaseTravelPointRestrictionsType" maxOccurs="1" minOccurs="0"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="PassPriceType">
+		<xs:sequence>
+			<xs:element name="totalPrice" type="com:TotalPriceType"/>
+			<xs:element name="ticketableFares">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="ticketableFare" type="com:PassTicketableFareType"
+							maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="fareMerchandisingRank" type="xs:int" minOccurs="0"/>
+			<xs:element name="holdExpiration" type="com:HoldExpirationType" minOccurs="0"/>
+            <xs:element name="compatiblePrices" type="com:CompatiblePricesType" minOccurs="0"/>
+		</xs:sequence>
+		<xs:attribute name="priceID" type="xs:ID" use="required"/>
+        <xs:attribute name="availabilityCheckBypassed" type="xs:boolean"/>
+	</xs:complexType>
+
+	<xs:complexType name="RequestStatusType">
+		<xs:sequence>
+			<xs:element name="success" type="xs:boolean"/>
+			<xs:element name="statusMessages" minOccurs="0">
+				<xs:complexType>
+					<xs:complexContent>
+						<xs:extension base="com:StatusMessages">
+							<xs:sequence>
+								<xs:element name="statusMessage" type="com:StatusMessageType"
+									maxOccurs="unbounded"/>
+							</xs:sequence>
+						</xs:extension>
+					</xs:complexContent>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="debug" type="xs:string"/>
+        <xs:attribute name="systemId" type="xs:string"/>
+	</xs:complexType>
+	<xs:simpleType name="ReservableType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="MANDATORY"/>
+			<xs:enumeration value="NOT_POSSIBLE"/>
+			<xs:enumeration value="OPTIONAL"/>
+			<xs:enumeration value="INCLUDED"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:complexType name="ResidenceInformationType">
+		<xs:sequence>
+			<xs:element name="countryCode" type="com:ISOCountryCodeType"/>
+			<xs:element name="stateProv" type="com:StateProvType" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="RoutingRestrictionsType">
+		<xs:sequence>
+			<xs:element name="routingRestriction" maxOccurs="unbounded"
+				type="com:RoutingRestrictionType"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="RoutingRestrictionType">
+		<xs:sequence>
+			<xs:element name="routingTravelPoint" type="com:TravelPointType"/>
+		</xs:sequence>
+		<xs:attribute name="type">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="PREFERRED"/>
+					<xs:enumeration value="RESTRICTED"/>
+					<xs:enumeration value="PERMITTED"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+
+	<xs:complexType name="TicketingOptionsAvailableType">
+		<xs:attribute name="TOD" type="xs:boolean" use="required"/>
+		<xs:attribute name="ETK" type="xs:boolean" use="required"/>
+		<xs:attribute name="PAH" type="xs:boolean" use="required"/>
+		<xs:attribute name="EML" type="xs:boolean" use="optional"/>
+		<xs:attribute name="DEPARTURE_STATION_TOD" type="xs:boolean" use="required"/>
+        <xs:attribute name="SMS" type="xs:boolean" use="optional"/>
+    </xs:complexType>
+	<xs:complexType name="RulesType">
+		<xs:sequence>
+			<xs:element name="rule" type="com:RuleType" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="RuleType">
+		<xs:sequence>
+			<xs:element name="description" type="xs:string" minOccurs="0"/>
+			<xs:element name="penalty" type="com:MoneyType" minOccurs="0"/>
+		</xs:sequence>
+		<xs:attribute name="type" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="EXCHANGE_ALLOWED"/>
+					<xs:enumeration value="EXCHANGE_PROHIBITED"/>
+					<xs:enumeration value="REFUND_ALLOWED"/>
+					<xs:enumeration value="REFUND_PROHIBITED"/>
+					<xs:enumeration value="TEXT"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+        <xs:attribute name="priceType">
+            <xs:simpleType>
+                <xs:restriction base="xs:string">
+                    <xs:enumeration value="TICKET"/>
+                    <xs:enumeration value="RESERVATION"/>
+					<xs:enumeration value="TRAVEL_PASS"/>
+                    <xs:enumeration value="FEE"/>
+                    <xs:enumeration value="ACCOMMODATION"/>
+                    <xs:enumeration value="LOCAL_SERVICE"/>
+                    <xs:enumeration value="ONBOARD_SERVICES"/>
+                </xs:restriction>
+            </xs:simpleType>
+        </xs:attribute>
+		<xs:attribute name="applicableOrderStatus">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="BOOKED"/>
+					<xs:enumeration value="CONFIRMED"/>
+					<xs:enumeration value="TICKETED"/>
+                    <xs:enumeration value="RETURNED"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="applicableTicketingOption">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="TVM"/>
+					<xs:enumeration value="TBX"/>
+					<xs:enumeration value="TBM"/>
+					<xs:enumeration value="TBO"/>
+					<xs:enumeration value="TML"/>
+					<xs:enumeration value="TOF"/>
+					<xs:enumeration value="TBC"/>
+					<xs:enumeration value="PAH"/>
+					<xs:enumeration value="ETK"/>
+                    <xs:enumeration value="PRN"/>
+                    <xs:enumeration value="SMS"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+        <xs:attribute name="expirationDateTime" type="xs:dateTime" />
+		<xs:attribute name="estimated" use="optional" type="xs:boolean"/>
+        <xs:attribute name="refundToVoucher">
+            <xs:simpleType>
+                <xs:restriction base="xs:string">
+                    <xs:enumeration value="NOT_POSSIBLE"/>
+                    <xs:enumeration value="OPTIONAL"/>
+                    <xs:enumeration value="MANDATORY"/>
+                    <xs:enumeration value="SPLIT"/>
+                </xs:restriction>
+            </xs:simpleType>
+        </xs:attribute>
+
+    </xs:complexType>
+	<xs:simpleType name="SeatAssignmentDirectionType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="FORWARD"/>
+			<xs:enumeration value="BACKWARD"/>
+			<xs:enumeration value="UNKNOWN"/>
+			<xs:enumeration value="UNASSIGNED"/>
+			<xs:enumeration value="AIRLINE"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:complexType name="SeatAssignmentType">
+		<xs:sequence>
+			<xs:element name="coach" type="xs:string"/>
+			<xs:element name="number" type="xs:string"/>
+			<xs:element name="direction" type="com:SeatAssignmentDirectionType"/>
+            <xs:element name="seatAttributes" minOccurs="0" maxOccurs="1">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="seatAttribute" type="com:SeatAttributeType" minOccurs="1" maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+		</xs:sequence>
+	</xs:complexType>
+
+    <xs:complexType name="SeatLocationListType">
+        <xs:sequence>
+            <!-- Currently a list with a single element -->
+            <xs:element name="seat" type="com:ExactSeatLocationType" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="ExactSeatLocationType">
+        <xs:sequence>
+            <xs:element name="coach" type="xs:string"/>
+            <xs:element name="number" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:simpleType name="SeatAttributeType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="WINDOW"/>
+            <xs:enumeration value="AISLE"/>
+            <xs:enumeration value="COMPARTMENT"/>
+            <xs:enumeration value="MIDDLE"/>
+            <xs:enumeration value="QUIET"/>
+            <xs:enumeration value="TABLE"/>
+            <xs:enumeration value="POWER"/>
+            <xs:enumeration value="PHONE"/>
+            <xs:enumeration value="LUGGAGE"/>
+            <xs:enumeration value="LAVATORY"/>
+            <xs:enumeration value="SINGLE" />
+        </xs:restriction>
+    </xs:simpleType>
+
+	<xs:simpleType name="SeatPreferenceType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="FORWARD"/>
+			<xs:enumeration value="BACKWARD"/>
+			<xs:enumeration value="AIRLINE"/>
+			<xs:enumeration value="WINDOW"/>
+			<xs:enumeration value="AISLE"/>
+			<xs:enumeration value="COMPARTMENT"/>
+			<xs:enumeration value="MIDDLE"/>
+			<xs:enumeration value="QUIET"/>
+			<xs:enumeration value="TABLE"/>
+			<xs:enumeration value="POWER"/>
+			<xs:enumeration value="PHONE"/>
+			<xs:enumeration value="LUGGAGE"/>
+			<xs:enumeration value="LAVATORY"/>
+			<xs:enumeration value="SINGLE" />
+            <xs:enumeration value="NEARBY" />
+		</xs:restriction>
+	</xs:simpleType>
+
+    <xs:complexType name="BaseSeatPreferenceType">
+          <xs:attribute name="marketingCarrier" type="xs:string" use="required"/>
+          <xs:attribute name="serviceClass" type="com:ServiceClassType" use="required"/>
+          <xs:attribute name="supplierEquipmentType" type="xs:string" use="optional"/>
+      </xs:complexType>
+
+    <xs:complexType name="AvailableSeatPreferenceType">
+        <xs:simpleContent>
+            <xs:extension base="com:SeatPreferenceType">
+                <xs:attribute name="marketingCarrier" type="xs:string" use="required"/>
+                <xs:attribute name="serviceClass" type="com:ServiceClassType" use="required"/>
+                <xs:attribute name="supplierEquipmentType" type="xs:string" use="optional"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+
+	<xs:complexType name="PassengerLoyaltyCardType">
+		<xs:simpleContent>
+			<xs:extension base="xs:string">
+				<xs:attribute name="program" type="xs:string" use="required"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+
+    <xs:complexType name="LoyaltyCardType">
+        <xs:sequence>
+            <xs:element name="marketingCarrier" type="xs:string" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:attribute name="program" type="xs:string" use="required"/>
+        <xs:attribute name="description" type="xs:string"/>
+    </xs:complexType>
+
+	<xs:complexType name="SegmentServiceListType">
+		<xs:sequence>
+			<xs:element name="station" type="xs:string" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="ServiceAlertType">
+		<xs:sequence>
+			<xs:element name="summary" type="xs:string"/>
+			<xs:element name="description" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:simpleType name="ServiceClassType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="FIRST"/>
+			<xs:enumeration value="SECOND"/>
+			<xs:enumeration value="THIRD"/>
+			<xs:enumeration value="PREMIER"/>
+			<xs:enumeration value="SLEEPER"/>
+			<xs:enumeration value="AUTO"/>
+			<xs:enumeration value="BEDROOM"/>
+			<xs:enumeration value="MISC"/>
+            <xs:enumeration value="NOT_APPLICABLE"/>
+			<xs:enumeration value="SLEEPERPLUS"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:complexType name="ShipmentTrackingType">
+		<xs:sequence>
+			<xs:element name="shipmentDate" type="xs:date" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="deliveryMethod" type="xs:string" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="trackingNumber" type="xs:string" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="shipperUrl" type="xs:string" minOccurs="0" maxOccurs="1"/>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:simpleType name="StateProvType">
+		<xs:restriction base="xs:string"/>
+	</xs:simpleType>
+	<xs:complexType name="StatusMessages"/>
+	<xs:complexType name="StatusMessageType">
+		<xs:sequence>
+			<xs:element name="message" type="xs:string"/>
+			<xs:element name="code" type="xs:string"/>
+            <xs:element name="internal" type="xs:string" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="TaxType">
+		<xs:sequence>
+			<xs:element name="description" type="xs:string"/>
+			<xs:element name="amount" type="com:MoneyType"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="TaxesType">
+		<xs:sequence>
+			<xs:element name="totalPrice" type="com:MoneyType"/>
+			<xs:element name="tax" type="com:TaxType" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="TicketableFareType">
+		<xs:sequence>
+			<xs:element name="totalPrice" type="com:TotalPriceType"/>
+			<xs:element name="passengerReferences">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="passengerReference" maxOccurs="unbounded">
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="passengerIDRef" type="xs:IDREF"/>
+									<xs:element name="passengerTypeCode" type="xs:string"/>
+									<xs:element name="fareCodes">
+										<xs:complexType>
+											<xs:sequence>
+												<xs:element name="fareCode" type="com:FareCodeType"
+												maxOccurs="unbounded"/>
+											</xs:sequence>
+										</xs:complexType>
+									</xs:element>
+									<xs:element name="passengerFareQualifiers" minOccurs="0">
+                                        <xs:annotation>
+                                            <xs:documentation>passengerFareQualifiers have been deprecated. They have been replaced by loyaltyCards.</xs:documentation>
+                                        </xs:annotation>
+										<xs:complexType>
+											<xs:sequence>
+												<xs:element name="passengerFareQualifier"
+												type="com:PassengerFareQualifierType"
+												maxOccurs="unbounded"/>
+											</xs:sequence>
+										</xs:complexType>
+									</xs:element>
+									<xs:element name="fareQualifierIDRef" minOccurs="0"
+										type="xs:IDREF"/>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="prices">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="price" type="com:PriceType" minOccurs="1"
+							maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+            <xs:element name="optionalPrices" minOccurs="0">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="optionalPrice" type="com:OptionalPriceType" minOccurs="1" maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="costs" minOccurs="0">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="cost" type="com:CostType" minOccurs="1"
+                            maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="commissions" minOccurs="0">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="commission" type="com:CommissionType" minOccurs="1"
+                            maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+			<xs:element name="commissionAmount" type="com:MoneyType" minOccurs="0"/>
+			<xs:element name="rules" minOccurs="0" type="com:RulesType"/>
+			<xs:element name="fareQualifiers" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="fareQualifier" type="com:FareQualifierType"
+							maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="cancelEligibility" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="cancelFee" type="com:MoneyType" minOccurs="0"/>
+			<xs:element name="ticketingOptionsAvailable" minOccurs="0">
+				<xs:complexType>
+					<xs:attribute name="TOD" type="xs:boolean" use="required"/>
+					<xs:attribute name="ETK" type="xs:boolean" use="required"/>
+					<xs:attribute name="PAH" type="xs:boolean" use="required"/>
+					<xs:attribute name="EML" type="xs:boolean" use="optional"/>
+					<xs:attribute name="DEPARTURE_STATION_TOD" type="xs:boolean" use="required"/>
+                    <xs:attribute name="SMS" type="xs:boolean" use="optional"/>
+				</xs:complexType>
+			</xs:element>
+
+			<xs:element name="fareOrigin" minOccurs="0" type="com:FareTerminalPointType"/>
+            <xs:element name="fareOriginTerminals" minOccurs="0" maxOccurs="1">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="fareOriginTerminal" type="com:FareTerminalPointType"
+                                    minOccurs="1"
+                                    maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+			<xs:element name="fareDestination" minOccurs="0" type="com:FareTerminalPointType"/>
+
+            <xs:element name="fareDestinationTerminals" minOccurs="0" maxOccurs="1">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="fareDestinationTerminal" type="com:FareTerminalPointType"
+                                    minOccurs="1"
+                                    maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+		</xs:sequence>
+        <xs:attribute name="ticketableFareID" type="xs:ID" use="optional">
+            <xs:annotation>
+                <xs:documentation>This attribute should be required but it will remain optional for backwards compatibility.</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+	</xs:complexType>
+
+	<xs:complexType name="PassTicketableFareType">
+		<xs:sequence>
+			<xs:element name="totalPrice" type="com:TotalPriceType"/>
+			<xs:element name="passengerReferences">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="passengerReference" maxOccurs="unbounded">
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="passengerIDRef" type="xs:IDREF"/>
+									<xs:element name="passengerTypeCode" type="xs:string"/>
+									<xs:element name="fareCodes">
+										<xs:complexType>
+											<xs:sequence>
+												<xs:element name="fareCode" type="com:PassFareCodeType"
+												maxOccurs="unbounded"/>
+											</xs:sequence>
+										</xs:complexType>
+									</xs:element>
+									<xs:element name="fareQualifierIDRef" minOccurs="0"
+										type="xs:IDREF"/>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="prices">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="price" type="com:PriceType" minOccurs="1"
+							maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+            <xs:element name="optionalPrices" minOccurs="0">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="optionalPrice" type="com:OptionalPriceType" minOccurs="1" maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="costs" minOccurs="0">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="cost" type="com:CostType" minOccurs="1"
+                            maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="commissions" minOccurs="0">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="commission" type="com:CommissionType" minOccurs="1"
+                            maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+			<xs:element name="commissionAmount" type="com:MoneyType" minOccurs="0"/>
+			<xs:element name="rules" minOccurs="0" type="com:RulesType"/>
+			<xs:element name="fareQualifiers" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="fareQualifier" type="com:FareQualifierType"
+							maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="cancelEligibility" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="cancelFee" type="com:MoneyType" minOccurs="0"/>
+			<xs:element name="ticketingOptionsAvailable" minOccurs="0">
+				<xs:complexType>
+					<xs:attribute name="TOD" type="xs:boolean" use="required"/>
+					<xs:attribute name="ETK" type="xs:boolean" use="required"/>
+					<xs:attribute name="PAH" type="xs:boolean" use="required"/>
+					<xs:attribute name="EML" type="xs:boolean" use="optional"/>
+					<xs:attribute name="DEPARTURE_STATION_TOD" type="xs:boolean" use="required"/>
+                    <xs:attribute name="SMS" type="xs:boolean" use="optional"/>
+				</xs:complexType>
+			</xs:element>
+
+			<xs:element name="fareOrigin" minOccurs="0" type="com:FareTerminalPointType"/>
+            <xs:element name="fareOriginTerminals" minOccurs="0" maxOccurs="1">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="fareOriginTerminal" type="com:FareTerminalPointType"
+                                    minOccurs="1"
+                                    maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+			<xs:element name="fareDestination" minOccurs="0" type="com:FareTerminalPointType"/>
+
+            <xs:element name="fareDestinationTerminals" minOccurs="0" maxOccurs="1">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="fareDestinationTerminal" type="com:FareTerminalPointType"
+                                    minOccurs="1"
+                                    maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+
+			<xs:element name="fareStartDate" type="xs:date" minOccurs="0"/>
+
+            <xs:element name="fareExpirationDate" type="xs:date" minOccurs="0"/>
+
+		</xs:sequence>
+        <xs:attribute name="ticketableFareID" type="xs:ID" use="optional">
+            <xs:annotation>
+                <xs:documentation>This attribute should be required but it will remain optional for backwards compatibility.</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+	</xs:complexType>
+
+    <xs:complexType name="SupplyChannelPassengerReferenceType">
+        <xs:sequence>
+            <xs:element name="passengerIDRef" type="xs:IDREF"/>
+            <xs:element name="nameFirst" type="xs:string" minOccurs="0"/>
+            <xs:element name="nameMiddle" type="xs:string" minOccurs="0"/>
+            <xs:element name="nameLast" type="xs:string" minOccurs="0"/>
+            <xs:element name="loyaltyCards" minOccurs="0">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="loyaltyCard" type="com:PassengerLoyaltyCardType" maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="TicketingOptionType">
+		<xs:sequence>
+			<xs:element name="description" type="xs:string" minOccurs="0"/>
+			<xs:element name="fee" type="com:RefundableMoneyType" minOccurs="0"/>
+		</xs:sequence>
+		<xs:attribute name="code" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="TVM"/>
+					<xs:enumeration value="TBX"/>
+					<xs:enumeration value="TBM"/>
+					<xs:enumeration value="TBO"/>
+					<xs:enumeration value="TML"/>
+					<xs:enumeration value="TOF"/>
+					<xs:enumeration value="TBC"/>
+					<xs:enumeration value="PAH"/>
+					<xs:enumeration value="ETK"/>
+					<xs:enumeration value="PRN"/>
+                    <xs:enumeration value="EML"/>
+                    <xs:enumeration value="SMS"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="type" type="xs:string"/>
+		<xs:attribute name="departureStation" type="xs:boolean"/>
+		<xs:attribute name="destination" type="xs:string"/>
+        <xs:attribute name="redeliveryAllowed" type="xs:boolean"/>
+	</xs:complexType>
+	<xs:complexType name="TravelPointPairType">
+		<xs:sequence>
+			<xs:element name="originTravelPoint" type="com:TravelPointType"/>
+			<xs:element name="destinationTravelPoint" type="com:TravelPointType"/>
+			<xs:element name="departureDateTimeWindow" type="com:DateTimeWindowType" minOccurs="0"/>
+			<xs:element name="arrivalDateTimeWindow" type="com:DateTimeWindowType" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+    <xs:complexType name="BaseTravelPointPairType">
+   		<xs:sequence>
+   			<xs:element name="originTravelPoint" type="com:TravelPointType"/>
+   			<xs:element name="destinationTravelPoint" type="com:TravelPointType"/>
+   		</xs:sequence>
+   	</xs:complexType>
+    <xs:complexType name="TravelPointPairDateType">
+        <xs:complexContent>
+            <xs:extension base="com:BaseTravelPointPairType">
+                <xs:sequence>
+              			<xs:element name="startDate" type="xs:date"/>
+              			<xs:element name="endDate" type="xs:date" minOccurs="0"/>
+              		</xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+   	</xs:complexType>
+	<xs:complexType name="TravelPointType">
+		<xs:simpleContent>
+			<xs:extension base="xs:string">
+				<xs:attribute name="type" type="com:TravelPointTypeEnumeration" use="required"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<xs:complexType name="TravelSegmentType">
+		<xs:sequence>
+			<xs:element name="originTravelPoint" type="com:TravelPointType"/>
+			<xs:element name="destinationTravelPoint" type="com:TravelPointType"/>
+			<xs:element name="departureDateTime" type="xs:dateTime"/>
+			<xs:element name="arrivalDateTime" type="xs:dateTime"/>
+			<xs:element name="serviceOrigins" type="com:SegmentServiceListType" minOccurs="0"/>
+			<xs:element name="serviceDestinations" type="com:SegmentServiceListType" minOccurs="0"/>
+			<xs:element name="designator" type="xs:string" minOccurs="0"/>
+			<xs:element name="marketingCarrier" type="com:CarrierType" minOccurs="0"/>
+			<xs:element name="operatingCarrier" type="com:CarrierType" minOccurs="0"/>
+            <xs:element name="supplierEquipmentType" type="com:SupplierEquipmentTypeType" minOccurs="0"/>
+			<xs:element name="distance" type="com:DistanceType" minOccurs="0"/>
+			<xs:element name="duration" type="xs:duration" minOccurs="0"/>
+			<xs:element name="onTimePercentage" type="xs:double" minOccurs="0"/>
+			<xs:element name="amenities" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="amenity" type="com:AmenityType" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="crossBorderInfo" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="supplierRecordLocator" type="com:AnorakRecordLocatorType"
+				minOccurs="0"/>
+			<xs:element name="equipmentType" type="com:EquipmentTypeType" minOccurs="0"/>
+			<xs:element name="carbonOffset" type="xs:double" minOccurs="0"/>
+			<xs:element name="viaTravelPoints" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="viaTravelPoint" type="com:TravelPointType"
+							maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="marketingServiceName" type="xs:string" minOccurs="0"/>
+            <xs:element name="marketingInformation" type="com:MarketingInformationType" minOccurs="0" maxOccurs="1"/>
+		</xs:sequence>
+		<xs:attribute name="sequence">
+			<xs:simpleType>
+				<xs:restriction base="xs:int">
+					<xs:minInclusive value="0"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="travelSegmentID" type="xs:ID" use="required"/>
+		<xs:attribute name="type" type="xs:string"/>
+		<xs:attribute name="legGrouping" type="xs:string" use="optional"/>
+	</xs:complexType>
+    <xs:complexType name="MarketingInformationType">
+        <xs:sequence minOccurs="0" maxOccurs="1"/>
+        <xs:attribute name="serviceCode" use="required"/>
+    </xs:complexType>
+	<xs:complexType name="TravelDocumentType">
+		<xs:sequence>
+			<xs:element name="documentNumber" type="xs:string"/>
+			<xs:element name="documentType">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="PHOTOCARD"/>
+						<xs:enumeration value="PERMRESIDENT"/>
+						<xs:enumeration value="PASSPORT"/>
+						<xs:enumeration value="NATURALCERT"/>
+						<xs:enumeration value="MILORDER"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="expirationDate" type="xs:date"/>
+			<xs:element name="issuingAuthority">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="countryCode" type="com:ISOCountryCodeType"/>
+						<xs:element name="stateProv" type="com:StateProvType" minOccurs="0"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="documentAffiliation" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="CITIZENSHIP"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="TravelPointTypeEnumeration">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="STATION"/>
+			<xs:enumeration value="CITY"/>
+			<xs:enumeration value="REGION"/>
+			<xs:enumeration value="COUNTRY"/>
+		</xs:restriction>
+	</xs:simpleType>
+    <xs:complexType name="ValueDocumentCouponType">
+        <xs:complexContent>
+            <xs:extension base="com:CouponType">
+                <xs:sequence>
+                    <xs:element name="couponReceivedDate" type="xs:date" minOccurs="0"/>      <!-- Returned Date-->
+                    <xs:element name="origin" type="com:TravelPointType" minOccurs="0"/>      <!-- Coupon Origin -->
+                    <xs:element name="destination" type="com:TravelPointType" minOccurs="0"/> <!-- Coupon Destination -->
+                    <xs:element name="refundApprovedDate" type="xs:date" minOccurs="0"/>      <!-- Approval for Refund Date -->
+                    <xs:element name="authorization" minOccurs="0">                           <!-- Authorization Description and Code -->
+                        <xs:complexType>
+                            <xs:simpleContent>
+                                <xs:extension base="xs:string">
+                                    <xs:attribute name="code" type="xs:string"/>
+                                </xs:extension>
+                            </xs:simpleContent>
+                        </xs:complexType>
+                    </xs:element>
+                    <xs:element name="departureDateTime" type="xs:dateTime" minOccurs="0" />
+                    <xs:element name="ticketTypeCode" type="xs:string" minOccurs="0" />
+                    <xs:element name="ticketType" type="xs:string" minOccurs="0" />
+                    <xs:element name="numberAdults" type="xs:string" minOccurs="0" />
+                    <xs:element name="numberChildren" type="xs:string" minOccurs="0" />
+                    <xs:element name="railcardPrintingName" type="xs:string" minOccurs="0" />
+					<xs:element name="ticketableFareIDRef" type="xs:IDREF" minOccurs="0"/>
+                </xs:sequence>
+                <xs:attribute name="type">                                                    <!-- Coupon Number -->
+                    <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                            <xs:enumeration value="SEAT"/>
+							<xs:enumeration value="TICKET"/>
+							<xs:enumeration value="TICKETED_RES"/>
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+	<xs:complexType name="ValueDocumentType">
+		<xs:sequence>
+			<xs:element name="valueDocumentLocator" type="com:AnorakRecordLocatorType"/>
+			<xs:element name="retrievalCustomer" type="xs:string"/>
+			<xs:element name="retrievalMaskedCreditCard" type="xs:string"/>
+            <xs:element name="retrievalCode" type="xs:string"/>
+            <xs:element name="coupons" minOccurs="0">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="coupon" type="com:ValueDocumentCouponType"
+                                    maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+			<xs:element name="url" minOccurs="0" type="xs:string"/>
+            <xs:element name="selectedTicketLanguage" type="xs:string" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="issuedDate" type="xs:date" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="data" minOccurs="0" maxOccurs="1">
+                <xs:complexType>
+                    <xs:simpleContent>
+                        <xs:extension base="xs:base64Binary">
+                            <xs:attribute name="type" type="xs:string" use="required"/>
+                        </xs:extension>
+                    </xs:simpleContent>
+                </xs:complexType>
+            </xs:element>
+		</xs:sequence>
+		<xs:attribute name="status" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="READY"/>
+					<xs:enumeration value="CANCELED"/>
+					<xs:enumeration value="PROCESSED"/>
+					<xs:enumeration value="ISSUED"/>
+					<xs:enumeration value="RETURNED"/>
+                    <xs:enumeration value="RETURNED_PARTIAL"/>
+					<xs:enumeration value="CONSUMED"/>
+                    <xs:enumeration value="PRINTING"/>
+                    <xs:enumeration value="FAILED"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+	<xs:complexType name="VoucherType">
+		<xs:sequence>
+			<xs:element name="number" type="xs:string"/>
+            <xs:element name="validationCode" type="xs:string" minOccurs="0"/>
+			<xs:element name="recipientName" type="xs:string"/>
+			<xs:element name="expirationDate" type="xs:date"/>
+            <xs:element name="value" type="com:MoneyType" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="YesNoType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="YES"/>
+			<xs:enumeration value="NO"/>
+		</xs:restriction>
+	</xs:simpleType>
+    <xs:complexType name="PassengerInformationType">
+        <xs:sequence>
+            <xs:element name="acceptableFormOfTravelDocument" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>
+                        PERMRESIDENT: Legal Permanent Resident Card
+                        PASSPORT: Passport
+                        NATURALCERT: Naturalization Certificate
+                        MILORDER: Military Order
+                        PHOTOCARD: Photocard required in the UK for acquiring season tickets
+
+                        Consult the SilverRail Documentation Portal for further information.
+                    </xs:documentation>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:enumeration value="PERMRESIDENT"/>
+                        <xs:enumeration value="PASSPORT"/>
+                        <xs:enumeration value="NATURALCERT"/>
+                        <xs:enumeration value="MILORDER"/>
+                        <xs:enumeration value="PHOTOCARD"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+        </xs:sequence>
+        <xs:attribute name="type" use="required">
+            <xs:simpleType>
+                <xs:restriction base="xs:string">
+                    <xs:enumeration value="PASSENGER_ADDRESS"/>
+                    <xs:enumeration value="TRAVEL_DOCUMENTS"/>
+                    <xs:enumeration value="DATE_OF_BIRTH"/>
+                    <xs:enumeration value="GENDER"/>
+                    <xs:enumeration value="RESIDENCE_INFORMATION"/>
+		    <xs:enumeration value="PASSENGER_NAME"/>
+		    <xs:enumeration value="PASSENGER_TITLE"/>
+                </xs:restriction>
+            </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="allPassengers" use="required" type="xs:boolean"/>
+    </xs:complexType>
+    <xs:complexType name="TypesType">
+        <xs:sequence>
+            <xs:element name="type" type="xs:string" minOccurs="1" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="PaymentRequirementsType">
+        <xs:sequence>
+            <xs:element name="acceptableFormsOfPayment" minOccurs="1" maxOccurs="1">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="formOfPayment" type="com:FormOfPaymentType"
+                            maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="confirmationUponAddPayment" minOccurs="1" maxOccurs="1"
+                type="xs:boolean"/>
+        </xs:sequence>
+    </xs:complexType>
+
+	<xs:complexType name="BaseTransactionFeeType" abstract="true">
+		<xs:sequence>
+			<xs:element name="fee" type="com:MoneyType" minOccurs="1" maxOccurs="1"/>
+		</xs:sequence>
+		<xs:attribute name="transactionFeeID" type="xs:ID" use="required"/>
+	</xs:complexType>
+
+
+    	<xs:complexType name="ConfirmationOptionsType">
+		<xs:sequence>
+			<xs:element name="creditCardOption" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="types" type="com:TypesType"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="debitCardOption" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="types" type="com:TypesType"/>
+						<xs:element name="sortCodeRequired" type="xs:boolean"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="loyaltyCardOption" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="programs">
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="program" type="xs:string" minOccurs="1"
+										maxOccurs="unbounded"/>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+						<xs:element name="expirationDateRequired" type="xs:boolean"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="personalInformationCardOption" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="countryCodes">
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="countryCode" type="xs:string" minOccurs="1"
+										maxOccurs="unbounded"/>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+    <xs:complexType name="FulfillmentPhoneNumberType">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="callingCountryCode" type="xs:integer"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+	
+	<xs:complexType name="ConfirmationInformationRequiredOverrideType">
+		<xs:sequence>
+			<xs:element name="ticketingOptionCode" type="com:TicketingCodeConfirmationRequiredOverride" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>	
+	</xs:complexType>
+	
+	<xs:complexType name="TicketingCodeConfirmationRequiredOverride">
+		<xs:simpleContent>
+			<xs:extension base="xs:string"/>
+		</xs:simpleContent>
+	</xs:complexType>
+
+    <xs:complexType name="CarrierRestrictionsType">
+        <xs:sequence>
+            <xs:element name="carrier" type="com:CarrierType"/>
+        </xs:sequence>
+        <xs:attribute name="type" use="required">
+            <xs:simpleType>
+                <xs:restriction base="xs:string">
+                    <xs:enumeration value="PREFERRED"/>
+                    <xs:enumeration value="PERMITTED"/>
+                    <xs:enumeration value="RESTRICTED"/>
+                </xs:restriction>
+            </xs:simpleType>
+        </xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="EquipmentTypeRestrictionsType">
+        <xs:sequence>
+            <xs:element name="equipmentType" type="com:EquipmentTypeType"/>
+        </xs:sequence>
+        <xs:attribute name="type" use="required">
+            <xs:simpleType>
+                <xs:restriction base="xs:string">
+                    <xs:enumeration value="PERMITTED"/>
+                    <xs:enumeration value="RESTRICTED"/>
+                </xs:restriction>
+            </xs:simpleType>
+        </xs:attribute>
+    </xs:complexType>
+
+
+    <xs:complexType name="BaseTravelPointRestrictionsType">
+   				<xs:sequence>
+                    <xs:element name="carrierRestriction" minOccurs="0" type="com:CarrierRestrictionsType"/>
+                    <xs:element name="equipmentTypeRestrictions" minOccurs="0" type="com:EquipmentTypeRestrictionsType"/>
+   					<xs:element name="routingRestrictions" minOccurs="0" type="com:RoutingRestrictionsType"/>
+   				</xs:sequence>
+   	</xs:complexType>
+
+	<xs:complexType name="RevisionType">
+		<xs:sequence>
+			<xs:element name="reason" type="com:RevisionReasonType" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="revisedDepartureDateTime" type="xs:dateTime" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="revisedArrivalDateTime" type="xs:dateTime" minOccurs="0" maxOccurs="1"/>
+		</xs:sequence>
+		<xs:attribute name="travelSegmentIDRef" type="xs:IDREF" use="required"/>
+	</xs:complexType>
+
+	<xs:complexType name="RevisionReasonType" mixed="true">
+		<xs:attribute name="code" use="optional"/>
+	</xs:complexType>
+
+	<xs:simpleType name="IssueType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="NEW"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+
+
+</xs:schema>

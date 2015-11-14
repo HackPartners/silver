@@ -1,0 +1,1189 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright 2015, SilverRail Technologies, Inc. All rights reserved.
+  -->
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:book="http://railgds.net/ws/booking"
+    xmlns:com="http://railgds.net/ws/commontypes" targetNamespace="http://railgds.net/ws/booking"
+    elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.65">
+
+    <xs:element name="addPaymentRequest" type="book:AddPaymentRequestType"/>
+    <xs:element name="addPaymentResponse" type="book:AddPaymentResponseType"/>
+    <xs:element name="authenticatePayerRequest" type="book:AuthenticatePayerRequestType"/>
+    <xs:element name="authenticatePayerResponse" type="book:AuthenticatePayerResponseType"/>
+    <xs:element name="cancelBookingRecordRequest" type="book:CancelBookingRecordRequestType"/>
+    <xs:element name="cancelBookingRecordResponse" type="book:CancelBookingRecordResponseType"/>
+    <xs:element name="claimValueDocumentRequest" type="book:ClaimValueDocumentRequestType"/>
+    <xs:element name="claimValueDocumentResponse" type="book:ClaimValueDocumentResponseType"/>
+    <xs:element name="confirmBookingRecordRequest" type="book:ConfirmBookingRecordRequestType"/>
+    <xs:element name="confirmBookingRecordResponse" type="book:ConfirmBookingRecordResponseType"/>
+    <xs:element name="createBookingRecordRequest" type="book:CreateBookingRecordRequestType"/>
+    <xs:element name="createBookingRecordResponse" type="book:CreateBookingRecordResponseType"/>
+    <xs:element name="recordFinancialTransactionRequest"
+        type="book:RecordFinancialTransactionRequestType"/>
+    <xs:element name="recordFinancialTransactionResponse"
+        type="book:RecordFinancialTransactionResponseType"/>
+    <xs:element name="redeliverValueDocumentRequest" type="book:RedeliverValueDocumentRequestType"/>
+    <xs:element name="redeliverValueDocumentResponse" type="book:RedeliverValueDocumentResponseType"/>
+    <xs:element name="retrieveBookingRecordRequest" type="book:RetrieveBookingRecordRequestType"/>
+    <xs:element name="retrieveBookingRecordResponse" type="book:RetrieveBookingRecordResponseType"/>
+    <xs:element name="returnValueDocumentRequest" type="book:ReturnValueDocumentRequestType"/>
+    <xs:element name="returnValueDocumentResponse" type="book:ReturnValueDocumentResponseType"/>
+    <xs:element name="searchBookingRecordsRequest" type="book:SearchBookingRecordsRequestType"/>
+    <xs:element name="searchBookingRecordsResponse" type="book:SearchBookingRecordsResponseType"/>
+    <xs:element name="updateBookingRecordRequest" type="book:UpdateBookingRecordRequestType"/>
+    <xs:element name="updateBookingRecordResponse" type="book:UpdateBookingRecordResponseType"/>
+    <xs:element name="refundBookingRecordRequest" type="book:RefundBookingRecordRequestType"/>
+    <xs:element name="refundBookingRecordResponse" type="book:RefundBookingRecordResponseType"/>
+    <xs:element name="validateBookingRecordInformationRequest" type="book:ValidateBookingRecordInformationRequestType"/>
+    <xs:element name="validateBookingRecordInformationResponse" type="book:ValidateBookingRecordInformationResponseType"/>
+    <xs:element name="generatePaymentTokenRequest" type="book:GeneratePaymentTokenRequestType"/>
+    <xs:element name="generatePaymentTokenResponse" type="book:GeneratePaymentTokenResponseType"/>
+    <xs:element name="deletePaymentTokenRequest" type="book:DeletePaymentTokenRequestType"/>
+    <xs:element name="deletePaymentTokenResponse" type="book:DeletePaymentTokenResponseType"/>
+    <xs:element name="retrieveCancellationSummaryRequest" type="book:RetrieveCancellationSummaryRequestType"/>
+    <xs:element name="retrieveCancellationSummaryResponse" type="book:RetrieveCancellationSummaryResponseType"/>
+
+    <xs:complexType name="AbstractPaymentRequestType" abstract="true">
+        <xs:complexContent>
+            <xs:extension base="book:BaseBookingRequestType">
+                <xs:sequence>
+                    <xs:element name="recordLocator" type="com:AnorakRecordLocatorType"/>
+                    <xs:element name="payment">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element name="formOfPayment" type="com:FormOfPaymentType"/>
+                                <xs:choice>
+                                    <xs:element name="creditCard"
+                                        type="book:AddPaymentCreditCardType"/>
+                                    <xs:element name="check" type="com:CheckType"/>
+                                    <xs:element name="onAccount" type="com:OnAccountType"/>
+                                    <xs:element name="debitCard" type="book:AddPaymentDebitCardType"/>
+                                    <xs:element name="voucher" type="com:VoucherType"/>
+                                    <xs:element name="eCheck" type="com:BaseECheckType"/>
+                                </xs:choice>
+                                <xs:element name="amount" type="com:MoneyType"/>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="AddPaymentCreditCardType">
+        <xs:complexContent>
+            <xs:extension base="com:BaseCreditCardType">
+                <xs:sequence>
+                    <xs:element name="validationNumber" type="xs:string"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="AddPaymentDebitCardType">
+        <xs:complexContent>
+            <xs:extension base="com:BaseDebitCardType">
+                <xs:sequence>
+                    <xs:element name="issueNumber" type="xs:string" minOccurs="0"/>
+                    <xs:element name="validationNumber" type="xs:string"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="AddPaymentRequestType">
+        <xs:complexContent>
+            <xs:extension base="book:AbstractPaymentRequestType">
+                <xs:sequence>
+                    <xs:element name="parameters" minOccurs="0">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element name="confirmBooking" type="xs:boolean" minOccurs="0"/>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                    <xs:element name="confirmationInformation" minOccurs="0"
+                        type="book:ConfirmationInformationType"/>
+                    <xs:element name="fulfillmentInformation" type="book:FulfillmentInformationType"
+                        minOccurs="0"/>
+                    <xs:element name="responseSpec" minOccurs="0">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element name="returnReservationDetails" type="xs:boolean"
+                                    minOccurs="0"/>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                    <xs:element name="customerIpAddress" type="xs:string" minOccurs="0"/>
+                    <xs:element name="threeDeeAuthenticatePayer" minOccurs="0">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element name="payerAuthenticationResponse" type="xs:string"/>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="AddPaymentResponseType">
+        <xs:complexContent>
+            <xs:extension base="com:BaseResponseType">
+                <xs:sequence>
+                    <xs:element name="recordLocator" type="com:AnorakRecordLocatorType"
+                        minOccurs="0"/>
+                    <xs:element name="bookingRecord" type="com:BookingRecordType" minOccurs="0"/>
+                    <xs:element name="notes" type="book:BookingNotesType" minOccurs="0"/>
+                    <xs:element name="paymentToken" type="xs:string" minOccurs="0"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="AuthenticatePayerRequestType">
+        <xs:complexContent>
+            <xs:extension base="book:AbstractPaymentRequestType">
+                <xs:sequence>
+                    <xs:element name="customerIpAddress" type="xs:string" minOccurs="0"/>
+                    <xs:element name="responseSpec" minOccurs="0">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element name="returnReservationDetails" type="xs:boolean"
+                                    minOccurs="0"/>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="AuthenticatePayerResponseType">
+        <xs:complexContent>
+            <xs:extension base="com:BaseResponseType">
+                <xs:sequence minOccurs="0">
+                    <xs:element name="threeDeeSecureAuthenticatePayer">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element name="isEnrolled" type="xs:boolean"/>
+                                <xs:element name="processor" type="xs:string" minOccurs="0"/>
+                                <xs:element name="accessControlServerUrl" type="xs:string"
+                                    minOccurs="0"/>
+                                <xs:element name="payerAuthenticationRequest" type="xs:string"
+                                    minOccurs="0"/>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="AuditableRequestType" abstract="true">
+        <xs:complexContent>
+            <xs:extension base="com:BaseRequestType">
+                <xs:sequence>
+                    <xs:element name="agentInformation" minOccurs="0">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element name="externalId" type="xs:string" minOccurs="0"/>
+                                <xs:element name="name" type="xs:string" minOccurs="0"/>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="BaseBookingRequestType" abstract="true">
+        <xs:complexContent>
+            <xs:extension base="book:AuditableRequestType">
+                <xs:sequence>
+                    <xs:element name="notes" minOccurs="0">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element name="note" type="com:BookingNoteType"
+                                    maxOccurs="unbounded"/>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                    <xs:element name="orderNotes" minOccurs="0" maxOccurs="1">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element name="orderNote" type="com:AddedOrderNoteType"
+                                    maxOccurs="unbounded"/>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="CancelBookingRecordRequestType">
+        <xs:complexContent>
+            <xs:extension base="book:BaseBookingRequestType">
+                <xs:sequence>
+                    <xs:element name="recordLocator" type="com:AnorakRecordLocatorType"/>
+                    <xs:element name="orderLocator" type="com:AnorakRecordLocatorType" maxOccurs="1" minOccurs="0"/>
+                    <xs:element name="ticketableFareLocators" maxOccurs="1" minOccurs="0">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element name="ticketableFareLocator" type="com:AnorakRecordLocatorType" minOccurs="1" maxOccurs="unbounded"/>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                    <xs:element name="expectedCancellationFee" type="com:MoneyType"/>
+                    <xs:element name="parameters" minOccurs="0">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element name="alwaysAcceptCancellationFee" type="xs:boolean"
+                                    minOccurs="0"/>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                    <xs:element name="responseSpec" minOccurs="0">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element name="returnReservationDetails" type="xs:boolean"
+                                    minOccurs="0"/>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                    <xs:element name="cancellationReason" type="com:CancellationReasonType"
+                        minOccurs="0" maxOccurs="1"/>
+                    <xs:element name="refundInformation" type="book:RefundInformationType"
+                        minOccurs="0"/>
+                    <xs:element name="selectedCancellationOption"
+                        type="com:SelectedCancellationOptionType" minOccurs="0" maxOccurs="1"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="RefundInformationType">
+        <xs:sequence>
+            <xs:element name="processRefundWithCancel" type="xs:boolean" default="false"/>
+            <xs:element name="receiptNumber" type="com:AnorakReceiptLocatorType" minOccurs="0"
+                maxOccurs="1"/>
+            <xs:element name="refundAmount" type="com:MoneyType" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="refundReason" type="xs:string" minOccurs="0" maxOccurs="1"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="CancelBookingRecordResponseType">
+        <xs:complexContent>
+            <xs:extension base="com:BaseResponseType">
+                <xs:sequence>
+                    <xs:element name="bookingRecord" type="com:BookingRecordType" minOccurs="0"/>
+                    <xs:element name="notes" type="book:BookingNotesType" minOccurs="0"/>
+                    <xs:element name="refundStatus" type="com:RequestStatusType" minOccurs="0"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="ClaimValueDocumentRequestType">
+        <xs:complexContent>
+            <xs:extension base="book:BaseBookingRequestType">
+                <xs:sequence>
+                    <xs:element name="recordLocator" type="com:AnorakRecordLocatorType"/>
+                    <xs:element name="orderLocator" type="com:AnorakRecordLocatorType" maxOccurs="1"
+                        minOccurs="0"/>
+                    <xs:element name="responseSpec" minOccurs="0">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element name="returnReservationDetails" type="xs:boolean"
+                                    minOccurs="0"/>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="ClaimValueDocumentResponseType">
+        <xs:complexContent>
+            <xs:extension base="com:BaseResponseType">
+                <xs:sequence>
+                    <xs:element name="valueDocument" type="com:ValueDocumentType" minOccurs="0"/>
+                    <xs:element name="bookingRecord" type="com:BookingRecordType" minOccurs="0"/>
+                    <xs:element name="notes" type="book:BookingNotesType" minOccurs="0"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+
+
+    <xs:complexType name="ConfirmBookingRecordRequestType">
+        <xs:complexContent>
+            <xs:extension base="book:BaseBookingRequestType">
+                <xs:sequence>
+                    <xs:element name="recordLocator" type="com:AnorakRecordLocatorType"/>
+                    <xs:element name="orderLocator" type="com:AnorakReceiptLocatorType"
+                        minOccurs="0" maxOccurs="1"/>
+                    <xs:element name="confirmationInformation"
+                        type="book:ConfirmationInformationType" minOccurs="0"/>
+                    <xs:element name="fulfillmentInformation" type="book:FulfillmentInformationType"
+                        minOccurs="0"/>
+                    <xs:element name="responseSpec" minOccurs="0">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element name="returnReservationDetails" type="xs:boolean"
+                                    minOccurs="0"/>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                    <xs:element name="returnClaimValueDocument" type="xs:boolean" minOccurs="0"
+                        maxOccurs="1"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="ConfirmBookingRecordResponseType">
+        <xs:complexContent>
+            <xs:extension base="com:BaseResponseType">
+                <xs:sequence>
+                    <xs:element name="bookingRecord" type="com:BookingRecordType" minOccurs="0"/>
+                    <xs:element name="notes" type="book:BookingNotesType" minOccurs="0"/>
+                    <xs:element name="claimValueDocumentResult"
+                        type="book:ClaimValueDocumentResultType" minOccurs="0"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="ClaimValueDocumentResultType">
+        <xs:sequence>
+            <xs:element type="com:RequestStatusType" name="result"/>
+            <xs:element type="xs:string" name="claimValueDocumentUrl" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="ConfirmationInformationType">
+        <xs:sequence>
+            <xs:choice>
+                <xs:element name="valueDocumentRetrievalInformation" minOccurs="0">
+                    <!-- remove minOccurs if/when we restore choice -->
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="customer">
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element name="nameLast" type="xs:string"/>
+                                        <xs:element minOccurs="0" name="nameFirst" type="xs:string"/>
+                                        <xs:element minOccurs="0" name="nameMiddle" type="xs:string"
+                                        />
+                                    </xs:sequence>
+                                </xs:complexType>
+                            </xs:element>
+                            <xs:element name="creditCardNumber" type="xs:string"/>
+                            <xs:element name="expirationDate" type="xs:gYearMonth" minOccurs="0"
+                                maxOccurs="1"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                <!-- remove minOccurs if/when we restore choice -->
+                <xs:element name="selectedConfirmationOption"
+                    type="com:selectedConfirmationOptionType" minOccurs="0"/>
+            </xs:choice>
+            <xs:element name="selectedTicketLanguage" type="xs:string" minOccurs="0" maxOccurs="1"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="BookingTransactionFeeType">
+        <xs:complexContent>
+            <xs:extension base="com:BaseTransactionFeeType"/>
+        </xs:complexContent>
+    </xs:complexType>
+
+
+    <xs:complexType name="CreateBookingRecordRequestType">
+        <xs:complexContent>
+            <xs:extension base="book:BaseBookingRequestType">
+                <xs:sequence>
+                    <xs:element name="passengers">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element name="passenger" type="com:PassengerType"
+                                    maxOccurs="unbounded"/>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                    <xs:element name="legSolutions" type="com:LegSolutionsType" minOccurs="0"/>
+                    <xs:element name="prices" minOccurs="0" maxOccurs="1">
+                        <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="pointToPointPrice"
+                                        type="com:PointToPointPriceType" maxOccurs="unbounded"/>
+                                </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                    <xs:element name="travelPassQuery" minOccurs="0" type="book:TravelPassQuery"/>
+                    <xs:element name="transactionFees" minOccurs="0" maxOccurs="1">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element name="transactionFee" minOccurs="1"
+                                    maxOccurs="unbounded" type="book:BookingTransactionFeeType"/>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                    <xs:element name="parameters" minOccurs="0">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element name="priceAcceptance" minOccurs="0">
+                                    <xs:complexType>
+                                        <xs:choice>
+                                            <xs:element name="acceptAny" type="xs:boolean"/>
+                                            <xs:sequence>
+                                                <xs:element name="acceptHigher"
+                                                  type="book:PriceAcceptanceType" minOccurs="0"/>
+                                                <xs:element name="acceptLower"
+                                                  type="book:PriceAcceptanceType" minOccurs="0"/>
+                                            </xs:sequence>
+                                        </xs:choice>
+                                    </xs:complexType>
+                                </xs:element>
+                                <xs:element name="shopAncillary" type="xs:boolean" minOccurs="0"/>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                    <xs:element name="responseSpec" minOccurs="0">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element name="returnReservationDetails" type="xs:boolean"
+                                    minOccurs="0"/>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                    <xs:element name="externalIdentification" type="com:ExternalIdentificationType"
+                        minOccurs="0"/>
+                    <xs:element name="fareQualifiers" minOccurs="0">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element name="fareQualifier" type="com:FareQualifierType"
+                                    maxOccurs="unbounded"/>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="CreateBookingRecordResponseType">
+        <xs:complexContent>
+            <xs:extension base="com:BaseResponseType">
+                <xs:sequence>
+                    <xs:element name="recordLocator" type="com:AnorakRecordLocatorType"
+                        minOccurs="0"/>
+                    <xs:element name="lastHoldDateTime" type="xs:dateTime" minOccurs="0"/>
+                    <xs:element name="bookingRecord" type="com:BookingRecordType" minOccurs="0"/>
+                    <xs:element name="notes" type="book:BookingNotesType" minOccurs="0"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="TravelPassQuery">
+        <xs:sequence>
+            <xs:element name="travelPointPair" type="com:QueryTravelPointPairPassType" maxOccurs="1"/>
+            <xs:element name="passPrices">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="travelPassPrice"
+                                    type="com:PassPriceType" maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="passIssueType" type="com:IssueType"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="FulfillmentInformationType">
+        <xs:sequence>
+            <xs:element name="ticketOption" type="com:TicketingOptionType"/>
+            <xs:element name="shippingName" type="xs:string" minOccurs="0"/>
+            <xs:element name="shippingAddress" type="com:AddressType" minOccurs="0"/>
+            <xs:element name="phoneNumber" type="com:FulfillmentPhoneNumberType" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="PriceAcceptanceType">
+        <xs:simpleContent>
+            <xs:extension base="xs:boolean">
+                <xs:attribute name="threshold" type="com:MoneyValueType"/>
+                <xs:attribute name="currency" type="xs:string"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+    <xs:complexType name="RetrieveBookingRecordRequestType">
+        <xs:complexContent>
+            <xs:extension base="book:AuditableRequestType">
+                <xs:sequence>
+                    <xs:choice>
+                        <xs:element name="recordLocator" type="com:AnorakRecordLocatorType"/>
+                        <xs:element name="supplyChannelRecordLocator"
+                            type="com:AnorakRecordLocatorType"/>
+                        <xs:element name="valueDocumentLocator" type="com:AnorakRecordLocatorType"/>
+                    </xs:choice>
+                    <xs:element name="orders" minOccurs="0">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element name="order" maxOccurs="unbounded">
+                                    <xs:complexType>
+                                        <xs:sequence>
+                                            <xs:element name="alternativeTicketPickupLocation"
+                                                type="com:TravelPointType" minOccurs="0"/>
+                                        </xs:sequence>
+                                        <xs:attribute name="orderNumber" type="xs:string"
+                                            use="required"/>
+                                    </xs:complexType>
+                                </xs:element>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                    <xs:element name="responseSpec" minOccurs="0">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element name="includeOrderDetails" type="xs:boolean"
+                                    minOccurs="0"/>
+                                <xs:element name="includeOrderCosts" type="xs:boolean" minOccurs="0"/>
+                                <xs:element name="includePassengerDetails" type="xs:boolean"
+                                    minOccurs="0"/>
+                                <xs:element name="includeFinancials" type="xs:boolean" minOccurs="0"/>
+                                <xs:element name="includePaymentRequirements" type="xs:boolean"
+                                    minOccurs="0"/>
+                                <xs:element name="includeTicketingOptions" type="xs:boolean"
+                                    minOccurs="0"/>
+                                <xs:element name="includeNotes" type="xs:boolean" minOccurs="0"/>
+                                <xs:element name="includeFulfillmentInformation" type="xs:boolean"
+                                    minOccurs="0"/>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="RetrieveBookingRecordResponseType">
+        <xs:complexContent>
+            <xs:extension base="com:BaseResponseType">
+                <xs:sequence>
+                    <xs:element name="bookingRecord" type="com:BookingRecordType" minOccurs="0"/>
+                    <xs:element name="notes" minOccurs="0">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element name="note" type="com:BookingNoteType"
+                                    maxOccurs="unbounded"/>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="RedeliverValueDocumentRequestType">
+        <xs:complexContent>
+            <xs:extension base="book:BaseBookingRequestType">
+                <xs:sequence>
+                    <xs:element name="recordLocator" type="com:AnorakRecordLocatorType"/>
+                    <xs:element name="orderLocator" type="com:AnorakRecordLocatorType" minOccurs="0"/>
+                    <xs:choice minOccurs="0">
+                        <xs:element name="emailAddress" type="xs:string"/>
+                        <xs:element name="phoneNumber" type="com:FulfillmentPhoneNumberType"/>
+                    </xs:choice>
+                    <xs:element name="language" type="xs:string" minOccurs="0"/>
+                    <xs:element name="responseSpec" minOccurs="0">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element name="returnReservationDetails" type="xs:boolean"
+                                    minOccurs="0"/>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="RedeliverValueDocumentResponseType">
+        <xs:complexContent>
+            <xs:extension base="com:BaseResponseType">
+                <xs:sequence>
+                    <xs:element name="deliveryStatus" minOccurs="0">
+                        <xs:complexType>
+                            <xs:choice minOccurs="0">
+                                <xs:element type="xs:boolean" name="directDeliveryRequested"/>
+                                <xs:element name="valueDocumentURL">
+                                    <xs:complexType>
+                                        <xs:simpleContent>
+                                            <xs:extension base="xs:string">
+                                                <xs:attribute name="expirationDateTime"
+                                                  type="xs:dateTime"/>
+                                            </xs:extension>
+                                        </xs:simpleContent>
+                                    </xs:complexType>
+                                </xs:element>
+                                <xs:element name="valueDocumentPDF">
+                                    <xs:complexType>
+                                        <xs:simpleContent>
+                                            <xs:extension base="xs:string">
+                                                <xs:attribute name="encoding" type="xs:string"/>
+                                            </xs:extension>
+                                        </xs:simpleContent>
+                                    </xs:complexType>
+                                </xs:element>
+                            </xs:choice>
+                        </xs:complexType>
+                    </xs:element>
+                    <xs:element name="bookingRecord" type="com:BookingRecordType" minOccurs="0"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="ReturnValueDocumentRequestType">
+        <xs:complexContent>
+            <xs:extension base="book:BaseBookingRequestType">
+                <xs:sequence>
+                    <xs:element name="recordLocator" type="com:AnorakRecordLocatorType"/>
+                    <xs:element name="orderLocator" type="com:AnorakRecordLocatorType" maxOccurs="1"
+                        minOccurs="0"/>
+                    <xs:element name="valueDocumentLocator" type="com:AnorakRecordLocatorType"/>
+                    <xs:choice>
+                        <xs:element name="receiveCoupons">
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="coupons">
+                                        <xs:complexType>
+                                            <xs:sequence>
+                                                <xs:element name="coupon" maxOccurs="unbounded">
+                                                    <xs:complexType>
+                                                        <xs:complexContent>
+                                                            <xs:extension base="com:CouponType">
+                                                                <xs:sequence>
+                                                                    <xs:element name="couponReceivedDate"
+                                                                                type="xs:date"/>
+                                                                    <xs:element name="origin"
+                                                                                type="com:TravelPointType" minOccurs="0"/>
+                                                                    <xs:element name="destination"
+                                                                                type="com:TravelPointType" minOccurs="0"/>
+                                                                </xs:sequence>
+                                                                <xs:attribute name="type" use="optional">
+                                                                    <xs:simpleType>
+                                                                        <xs:restriction base="xs:string">
+                                                                            <xs:enumeration value="SEAT"/>
+                                                                            <xs:enumeration value="TICKET"/>
+                                                                        </xs:restriction>
+                                                                    </xs:simpleType>
+                                                                </xs:attribute>
+                                                            </xs:extension>
+                                                        </xs:complexContent>
+                                                    </xs:complexType>
+                                                </xs:element>
+                                            </xs:sequence>
+                                        </xs:complexType>
+                                    </xs:element>
+                                </xs:sequence>
+                                <xs:attribute name="returnType" use="required">
+                                    <xs:simpleType>
+                                        <xs:restriction base="xs:string">
+                                            <xs:enumeration value="FULL"/>
+                                            <xs:enumeration value="PARTIAL"/>
+                                        </xs:restriction>
+                                    </xs:simpleType>
+                                </xs:attribute>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element name="authorizeRefund">
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="coupons">
+                                        <xs:complexType>
+                                            <xs:sequence>
+                                                <xs:element name="coupon" maxOccurs="unbounded">
+                                                  <xs:complexType>
+                                                  <xs:complexContent>
+                                                  <xs:extension base="com:CouponType">
+                                                  <xs:sequence>
+                                                  <xs:element name="refundApprovedDate"
+                                                  type="xs:date"/>
+                                                  <xs:element name="authorization">
+                                                  <xs:complexType>
+                                                  <xs:simpleContent>
+                                                  <xs:extension base="xs:string">
+                                                  <xs:attribute name="code" type="xs:string"/>
+                                                  </xs:extension>
+                                                  </xs:simpleContent>
+                                                  </xs:complexType>
+                                                  </xs:element>
+                                                  </xs:sequence>
+                                                  </xs:extension>
+                                                  </xs:complexContent>
+                                                  </xs:complexType>
+                                                </xs:element>
+                                            </xs:sequence>
+                                        </xs:complexType>
+                                    </xs:element>
+                                    <xs:element name="reverseRevenue" minOccurs="0" maxOccurs="1">
+                                        <xs:complexType>
+                                            <xs:sequence>
+                                                <xs:element name="amount" type="com:MoneyType"/>
+                                                <xs:element name="description" type="xs:string"/>
+                                            </xs:sequence>
+                                        </xs:complexType>
+                                    </xs:element>
+                                    <xs:element name="reverseCost" minOccurs="0">
+                                        <xs:complexType>
+                                            <xs:sequence>
+                                                <xs:element name="amount" type="com:MoneyType"/>
+                                                <xs:element name="description" type="xs:string"/>
+                                            </xs:sequence>
+                                        </xs:complexType>
+                                    </xs:element>
+                                    <xs:element name="cancellationPenalty" type="com:MoneyType"
+                                        minOccurs="0" maxOccurs="1"/>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                    </xs:choice>
+                    <xs:element name="responseSpec" minOccurs="0">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element name="returnReservationDetails" type="xs:boolean"
+                                    minOccurs="0"/>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="ReturnValueDocumentResponseType">
+        <xs:complexContent>
+            <xs:extension base="com:BaseResponseType">
+                <xs:sequence>
+                    <xs:element name="bookingRecord" type="com:BookingRecordType" minOccurs="0"/>
+                    <xs:element name="notes" type="book:BookingNotesType" minOccurs="0"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="SearchBookingRecordsRequestType">
+        <xs:annotation>
+            <xs:documentation>SearchBookingRecordsRequestType is deprecated. Please use search-ws instead</xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="com:BaseRequestType">
+                <xs:sequence>
+                    <xs:element name="searchCriteria">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element name="passengerLastName" type="xs:string" minOccurs="0"/>
+                                <xs:element name="emailAddress" type="xs:string" minOccurs="0"/>
+                                <xs:element name="supplyChannelLocator"
+                                    type="com:AnorakRecordLocatorType" minOccurs="0"/>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="SearchBookingRecordsResponseType">
+        <xs:annotation>
+            <xs:documentation>SearchBookingRecordsResponseType is deprecated. Please use search-ws instead</xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="com:BaseResponseType">
+                <xs:sequence>
+                    <xs:element name="bookingRecords">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element name="bookingRecord" type="com:BookingRecordType"
+                                    minOccurs="0" maxOccurs="unbounded"/>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="UpdateBookingRecordRequestType">
+        <xs:complexContent>
+            <xs:extension base="book:BaseBookingRequestType">
+                <xs:sequence>
+                    <xs:element name="recordLocator" type="com:AnorakRecordLocatorType"/>
+                    <xs:element name="orderLocator" type="com:AnorakReceiptLocatorType"
+                        minOccurs="0" maxOccurs="1"/>
+                    <xs:element name="serviceFees" type="com:FeesType" minOccurs="0"/>
+                    <xs:choice>
+                        <xs:element name="fulfillmentInformation"
+                            type="book:FulfillmentInformationType" minOccurs="0"/>
+                        <xs:element name="removeSelectedTicketingOption" minOccurs="0">
+                            <xs:complexType/>
+                        </xs:element>
+                    </xs:choice>
+                    <xs:element name="customInformation" type="com:CustomInformationType"
+                        minOccurs="0"/>
+                    <xs:element name="shipmentTracking" type="com:ShipmentTrackingType"
+                        minOccurs="0"/>
+                    <xs:element name="order" minOccurs="0">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element name="passengers">
+                                    <xs:complexType>
+                                        <xs:sequence>
+                                            <xs:element name="passenger" type="com:PassengerType"
+                                                maxOccurs="unbounded"/>
+                                        </xs:sequence>
+                                    </xs:complexType>
+                                </xs:element>
+                                <xs:element name="legSolutions" type="com:LegSolutionsType"/>
+                                <xs:element name="prices">
+                                    <xs:complexType>
+                                        <xs:sequence>
+                                            <xs:element name="pointToPointPrice"
+                                                type="com:PointToPointPriceType"
+                                                maxOccurs="unbounded"/>
+                                        </xs:sequence>
+                                    </xs:complexType>
+                                </xs:element>
+                                <xs:element name="parameters" minOccurs="0">
+                                    <xs:complexType>
+                                        <xs:sequence>
+                                            <xs:element name="priceAcceptance" minOccurs="0">
+                                                <xs:complexType>
+                                                  <xs:choice>
+                                                  <xs:element name="acceptAny" type="xs:boolean"/>
+                                                  <xs:sequence>
+                                                  <xs:element name="acceptHigher"
+                                                  type="book:PriceAcceptanceType" minOccurs="0"/>
+                                                  <xs:element name="acceptLower"
+                                                  type="book:PriceAcceptanceType" minOccurs="0"/>
+                                                  </xs:sequence>
+                                                  </xs:choice>
+                                                </xs:complexType>
+                                            </xs:element>
+                                            <xs:element name="shopAncillary" type="xs:boolean"
+                                                minOccurs="0"/>
+                                        </xs:sequence>
+                                    </xs:complexType>
+                                </xs:element>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                    <xs:element name="passengers" minOccurs="0">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element name="passenger" type="com:PassengerType"
+                                    maxOccurs="unbounded"/>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                    <xs:element name="responseSpec" minOccurs="0">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element name="returnReservationDetails" type="xs:boolean"
+                                    minOccurs="0"/>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                    <xs:element name="externalIdentification" type="com:ExternalIdentificationType"
+                        minOccurs="0"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="UpdateBookingRecordResponseType">
+        <xs:complexContent>
+            <xs:extension base="com:BaseResponseType">
+                <xs:sequence>
+                    <xs:element name="bookingRecord" type="com:BookingRecordType" minOccurs="0"/>
+                    <xs:element name="notes" type="book:BookingNotesType" minOccurs="0"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="RecordFinancialTransactionRequestType">
+        <xs:complexContent>
+            <xs:extension base="book:BaseBookingRequestType">
+                <xs:sequence>
+                    <xs:element name="recordLocator" type="com:AnorakRecordLocatorType"/>
+                    <xs:element name="refunds" minOccurs="0" maxOccurs="1">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element name="refund" minOccurs="1" maxOccurs="unbounded">
+                                    <xs:complexType>
+                                        <xs:sequence>
+                                            <xs:element name="receiptNumber"
+                                                type="com:AnorakReceiptLocatorType"/>
+                                            <xs:element name="refundAmount" type="com:MoneyType"/>
+                                            <xs:element name="refundReason" type="xs:string"
+                                                minOccurs="0"/>
+                                            <xs:element name="paymentProcessorInfo"
+                                                type="com:PaymentProcessorInfoType" minOccurs="0"/>
+                                        </xs:sequence>
+                                    </xs:complexType>
+                                </xs:element>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                    <xs:element name="responseSpec" minOccurs="0">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element name="returnReservationDetails" type="xs:boolean"
+                                    minOccurs="0"/>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="RecordFinancialTransactionResponseType">
+        <xs:complexContent>
+            <xs:extension base="com:BaseResponseType">
+                <xs:sequence>
+                    <xs:element name="bookingRecord" type="com:BookingRecordType" minOccurs="0"/>
+                    <xs:element name="notes" type="book:BookingNotesType" minOccurs="0"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="RefundBookingRecordRequestType">
+        <xs:complexContent>
+            <xs:extension base="book:BaseBookingRequestType">
+                <xs:sequence>
+                    <xs:element name="recordLocator" type="com:AnorakRecordLocatorType"/>
+                    <xs:element name="responseSpec" minOccurs="0">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element name="returnReservationDetails" type="xs:boolean"
+                                    minOccurs="0"/>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                    <xs:element name="receiptNumber" type="com:AnorakReceiptLocatorType"/>
+                    <xs:element name="refundAmount" type="com:MoneyType"/>
+                    <xs:element name="refundReason" type="xs:string" minOccurs="0"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="RefundBookingRecordResponseType">
+        <xs:complexContent>
+            <xs:extension base="com:BaseResponseType">
+                <xs:sequence>
+                    <xs:element name="bookingRecord" type="com:BookingRecordType" minOccurs="0"/>
+                    <xs:element name="notes" type="book:BookingNotesType" minOccurs="0"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="BookingNotesType">
+        <xs:sequence>
+            <xs:element name="note" type="com:BookingNoteType" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="ValidateBookingRecordInformationRequestType">
+        <xs:complexContent>
+            <xs:extension base="book:CreateBookingRecordRequestType"/>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="ValidateBookingRecordInformationResponseType">
+        <xs:complexContent>
+            <xs:extension base="com:BaseResponseType">
+                <xs:sequence>
+                    <xs:element name="bookingRecordInformation" maxOccurs="1" minOccurs="0">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element name="orderInformationSet" minOccurs="1" maxOccurs="1">
+                                    <xs:complexType>
+                                        <xs:sequence>
+                                            <xs:element name="orderInformation" minOccurs="1"
+                                                maxOccurs="unbounded">
+                                                <xs:complexType>
+                                                    <xs:sequence>
+                                                        <xs:element name="travelSegments" minOccurs="1"
+                                                                    maxOccurs="1">
+                                                            <xs:complexType>
+                                                                <xs:sequence>
+                                                                    <xs:element name="travelSegment"
+                                                                                type="com:TravelSegmentType"
+                                                                                minOccurs="0"
+                                                                                maxOccurs="unbounded"/>
+                                                                </xs:sequence>
+                                                            </xs:complexType>
+                                                        </xs:element>
+                                                        <xs:element name="ticketingOptions" minOccurs="1"
+                                                                    maxOccurs="1">
+                                                            <xs:complexType>
+                                                                <xs:sequence>
+                                                                    <xs:element name="ticketingOption"
+                                                                                type="com:TicketingOptionType"
+                                                                                maxOccurs="unbounded"/>
+                                                                </xs:sequence>
+                                                            </xs:complexType>
+                                                        </xs:element>
+                                                        <xs:element name="confirmationOptions"
+                                                                    minOccurs="0" maxOccurs="1"
+                                                                    type="com:ConfirmationOptionsType"/>
+                                                        <xs:element name="confirmationInformationRequired"
+                                                                    minOccurs="1" maxOccurs="1" type="xs:boolean"/>
+                                                        <xs:element
+                                                                name="paymentCardRequiredForConfirmationInformation"
+                                                                minOccurs="1" maxOccurs="1" type="xs:boolean"/>
+                                                        <xs:element name="availableTicketLanguages"
+                                                                    minOccurs="0" maxOccurs="1">
+                                                            <xs:complexType>
+                                                                <xs:sequence>
+                                                                    <xs:element name="language" type="xs:string"
+                                                                                minOccurs="1" maxOccurs="unbounded"/>
+                                                                </xs:sequence>
+                                                            </xs:complexType>
+                                                        </xs:element>
+                                                        <xs:element name="externalBookingUrl"
+                                                                    minOccurs="0" maxOccurs="1" type="xs:string"/>
+                                                        <xs:element name="commercialAgentName"
+                                                                    minOccurs="0" maxOccurs="1" type="xs:string"/>
+                                                    </xs:sequence>
+                                                </xs:complexType>
+                                            </xs:element>
+                                        </xs:sequence>
+                                    </xs:complexType>
+                                </xs:element>
+                                <xs:element name="paymentRequirements" minOccurs="1"
+                                    type="com:PaymentRequirementsType"/>
+                                <xs:element name="serviceFeeAllowed" minOccurs="0" type="xs:boolean"
+                                />
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="TokenPaymentType">
+        <xs:annotation>
+            <xs:documentation>Acceptable Values for 'CC' type: AX, CA, VI, DI, UA, MC</xs:documentation>
+            <xs:documentation>Acceptable Values for 'DB' type: DS, DV, DM</xs:documentation>
+        </xs:annotation>
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="type">
+                    <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                            <xs:enumeration value="CC"/>
+                            <xs:enumeration value="DB"/>
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:attribute>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+
+    <xs:complexType name="GeneratePaymentTokenRequestType">
+        <xs:complexContent>
+            <!--Using Auditable here only for consistency of messages (message processor expectations) in the booking service -->
+            <xs:extension base="book:AuditableRequestType">
+                <xs:sequence>
+                    <xs:element name="payment">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element name="formOfPayment" type="book:TokenPaymentType"/>
+                                <xs:choice>
+                                    <xs:element name="creditCard"
+                                        type="book:AddPaymentCreditCardType"/>
+                                    <xs:element name="debitCard" type="book:AddPaymentDebitCardType"/>
+                                </xs:choice>
+                                <xs:element name="customerIpAddress" type="xs:string" minOccurs="0"/>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="GeneratePaymentTokenResponseType">
+        <xs:complexContent>
+            <xs:extension base="com:BaseResponseType">
+                <xs:sequence>
+                    <xs:element name="paymentToken" type="xs:string" minOccurs="0"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="DeletePaymentTokenRequestType">
+        <xs:complexContent>
+            <!--Using Auditable here only for consistency of messages (message processor expectations) in the booking service -->
+            <xs:extension base="book:AuditableRequestType">
+                <xs:sequence>
+                    <xs:element name="paymentToken" type="xs:string"/>
+                    <xs:element name="accountHolderFirstName" type="xs:string"/>
+                    <xs:element name="accountHolderLastName" type="xs:string"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="DeletePaymentTokenResponseType">
+        <xs:complexContent>
+            <xs:extension base="com:BaseResponseType">
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="RetrieveCancellationSummaryRequestType">
+        <xs:complexContent>
+            <xs:extension base="book:AuditableRequestType">
+                <xs:sequence>
+                    <xs:element name="recordLocator" type="com:AnorakRecordLocatorType" minOccurs="1" maxOccurs="1"/>
+                    <xs:element name="orderLocator" type="com:AnorakRecordLocatorType" minOccurs="0" maxOccurs="1"/>
+                    <xs:element name="ticketableFareLocators" minOccurs="0" maxOccurs="1">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element name="ticketableFareLocator" type="com:AnorakRecordLocatorType" minOccurs="1" maxOccurs="unbounded"/>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>                            
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="RetrieveCancellationSummaryResponseType">
+        <xs:complexContent>
+            <xs:extension base="com:BaseResponseType">
+                <xs:sequence>
+                    <xs:element name="orders" minOccurs="0" maxOccurs="1">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element name="order" minOccurs="1" maxOccurs="unbounded">
+                                    <xs:complexType>
+                                        <xs:sequence>
+                                            <xs:element name="cancellationSummary" type="com:CancellationSummaryType"/>
+                                        </xs:sequence>
+                                        <xs:attribute name="orderID" use="required"/>                                        
+                                    </xs:complexType>                                        
+                                </xs:element>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+</xs:schema>

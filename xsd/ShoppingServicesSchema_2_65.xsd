@@ -1,0 +1,403 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright 2012, SilverRail Technologies, Inc. All rights reserved.
+  -->
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:shop="http://railgds.net/ws/shopping"
+           xmlns:com="http://railgds.net/ws/commontypes"
+           targetNamespace="http://railgds.net/ws/shopping"
+           elementFormDefault="qualified"
+           attributeFormDefault="unqualified" version="2.65">
+
+	<xs:element name="pointToPointShoppingRequest" type="shop:PointToPointShoppingRequestType"/>
+	<xs:element name="pointToPointShoppingResponse" type="shop:PointToPointShoppingResponseType"/>
+    <xs:element name="travelPassShoppingRequest" type="shop:TravelPassShoppingRequestType"/>
+   	<xs:element name="travelPassShoppingResponse" type="shop:TravelPassShoppingResponseType"/>
+	<xs:element name="scheduleSearchRequest" type="shop:ScheduleSearchRequestType"/>
+	<xs:element name="scheduleSearchResponse" type="shop:ScheduleSearchResponseType"/>
+
+	<xs:complexType name="PointToPointShoppingQuery">
+		<xs:sequence>
+			<xs:element name="travelPointPairs">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="travelPointPair" type="shop:QueryTravelPointPairType" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="passengerSpecs">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="passengerSpec" maxOccurs="unbounded">
+							<xs:complexType>
+								<xs:complexContent>
+									<xs:extension base="com:PassengerSpecType">
+										<xs:sequence>
+											<xs:element name="passengerFareQualifiers" minOccurs="0">
+                                                <xs:annotation>
+                                                    <xs:documentation>passengerFareQualifiers have been deprecated. They have been replaced by loyaltyCards.</xs:documentation>
+                                                </xs:annotation>
+												<xs:complexType>
+													<xs:sequence>
+														<xs:element name="passengerFareQualifier" type="com:PassengerFareQualifierType" maxOccurs="unbounded"/>
+													</xs:sequence>
+												</xs:complexType>
+											</xs:element>
+										</xs:sequence>
+									</xs:extension>
+								</xs:complexContent>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="fareQualifiers" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="fareQualifier" type="com:FareQualifierType" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="fareFilter" use="optional">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="NONE"/>
+					<xs:enumeration value="CHEAPEST"/>
+                    <xs:enumeration value="CHEAPEST_ONEWAY_AND_ROUNDTRIP"/>
+                    <xs:enumeration value="OPEN"/>
+                    <xs:enumeration value="CHEAPEST_OPEN"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+	<xs:complexType name="PointToPointShoppingRequestType">
+		<xs:complexContent>
+			<xs:extension base="com:BaseRequestType">
+				<xs:sequence>
+					<xs:element name="pointToPointShoppingQuery" type="shop:PointToPointShoppingQuery"/>
+					<xs:element name="responseSpec" minOccurs="0">
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="includeCommissions" type="xs:boolean" minOccurs="0"/>
+								<xs:element name="intermediatePoints" minOccurs="0">
+									<xs:simpleType>
+										<xs:restriction base="xs:string">
+											<xs:enumeration value="CONNECTION_POINTS_ONLY"/>
+											<xs:enumeration value="CONNECTION_POINTS_AND_STOPS"/>
+											<xs:enumeration value="NONE"/>
+										</xs:restriction>
+									</xs:simpleType>
+								</xs:element>
+								<xs:element name="validFareTypes" minOccurs="0">
+									<xs:simpleType>
+										<xs:restriction base="xs:string">
+											<xs:enumeration value="ALL"/>
+											<xs:enumeration value="PRIVATE_ONLY"/>
+											<xs:enumeration value="PUBLIC_ONLY"/>
+										</xs:restriction>
+									</xs:simpleType>
+								</xs:element>
+								<xs:element name="maximumNumberOfSolutions" type="xs:int" minOccurs="0"/>
+								<xs:element name="productType" minOccurs="0">
+									<xs:simpleType>
+										<xs:restriction base="xs:string">
+											<xs:enumeration value="TICKET"/>
+											<xs:enumeration value="RESERVATION"/>
+										</xs:restriction>
+									</xs:simpleType>
+								</xs:element>
+								<xs:element name="includeRules" type="xs:boolean" minOccurs="0"/>
+                                <xs:element name="includeOptionalPrices" minOccurs="0">
+                                    <xs:complexType>
+                                        <xs:attribute name="reservations" type="xs:boolean" use="required"/>
+                                        <xs:attribute name="accommodations" type="xs:boolean" use="required"/>
+                                        <xs:attribute name="onboardServices" type="xs:boolean" use="required"/>
+                                        <xs:attribute name="localServices" type="xs:boolean" use="required"/>
+                                    </xs:complexType>
+                                </xs:element>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="PointToPointShoppingResponseType">
+		<xs:complexContent>
+			<xs:extension base="com:BaseResponseType">
+				<xs:sequence>
+					<xs:element name="results" minOccurs="0">
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="legs">
+									<xs:complexType>
+										<xs:sequence>
+											<xs:element name="leg" type="com:LegType" maxOccurs="unbounded"/>
+										</xs:sequence>
+									</xs:complexType>
+								</xs:element>
+								<xs:element name="passengers">
+									<xs:complexType>
+										<xs:sequence>
+											<xs:element name="passenger" type="com:PassengerSpecType" maxOccurs="unbounded"/>
+										</xs:sequence>
+									</xs:complexType>
+								</xs:element>
+								<xs:element name="fareInformation">
+									<xs:complexType>
+										<xs:sequence>
+											<xs:element name="prices">
+												<xs:complexType>
+													<xs:sequence>
+														<xs:element name="pointToPointPrice" type="com:PointToPointPriceType" maxOccurs="unbounded"/>
+													</xs:sequence>
+												</xs:complexType>
+											</xs:element>
+											<xs:element name="transactionFees" minOccurs="0" maxOccurs="1">
+												<xs:complexType>
+													<xs:sequence>
+														<xs:element name="transactionFee" minOccurs="1" maxOccurs="unbounded" type="shop:ShoppingTransactionFeeType"/>
+													</xs:sequence>
+												</xs:complexType>
+											</xs:element>
+										</xs:sequence>
+									</xs:complexType>
+								</xs:element>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+    <xs:complexType name="TravelPassShoppingQuery">
+   		<xs:sequence>
+            <xs:element name="travelPointPair" type="com:QueryTravelPointPairPassType" maxOccurs="1"/>
+            <xs:element name="passengerSpecs">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="passengerSpec" type="com:PassengerSpecType" maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="fareQualifiers" minOccurs="0">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="fareQualifier" type="com:FareQualifierType" maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+			<xs:element name="issueType" type="com:IssueType" minOccurs="0"/>
+   		</xs:sequence>
+   		<xs:attribute name="fareFilter" use="optional">
+   			<xs:simpleType>
+   				<xs:restriction base="xs:string">
+   					<xs:enumeration value="NONE"/>
+   					<xs:enumeration value="CHEAPEST"/>
+                       <xs:enumeration value="CHEAPEST_ONEWAY_AND_ROUNDTRIP"/>
+                       <xs:enumeration value="OPEN"/>
+                       <xs:enumeration value="CHEAPEST_OPEN"/>
+   				</xs:restriction>
+   			</xs:simpleType>
+   		</xs:attribute>
+   	</xs:complexType>
+
+    <xs:complexType name="TravelPassShoppingRequestType">
+   		<xs:complexContent>
+   			<xs:extension base="com:BaseRequestType">
+   				<xs:sequence>
+   					<xs:element name="travelPassShoppingQuery" type="shop:TravelPassShoppingQuery"/>
+   					<xs:element name="responseSpec" minOccurs="0">
+   						<xs:complexType>
+   							<xs:sequence>
+   								<xs:element name="includeCommissions" type="xs:boolean" minOccurs="0"/>
+   								<xs:element name="validFareTypes" minOccurs="0">
+   									<xs:simpleType>
+   										<xs:restriction base="xs:string">
+   											<xs:enumeration value="ALL"/>
+   											<xs:enumeration value="PRIVATE_ONLY"/>
+   											<xs:enumeration value="PUBLIC_ONLY"/>
+   										</xs:restriction>
+   									</xs:simpleType>
+   								</xs:element>
+   								<xs:element name="maximumNumberOfSolutions" type="xs:int" minOccurs="0"/>
+   								<xs:element name="includeRules" type="xs:boolean" minOccurs="0"/>
+                                   <xs:element name="includeOptionalPrices" minOccurs="0">
+                                       <xs:complexType>
+                                           <xs:attribute name="travelPasses" type="xs:boolean" use="required"/>
+                                       </xs:complexType>
+                                   </xs:element>
+   							</xs:sequence>
+   						</xs:complexType>
+   					</xs:element>
+   				</xs:sequence>
+   			</xs:extension>
+   		</xs:complexContent>
+   	</xs:complexType>
+   	<xs:complexType name="TravelPassShoppingResponseType">
+   		<xs:complexContent>
+   			<xs:extension base="com:BaseResponseType">
+   				<xs:sequence>
+   					<xs:element name="results" minOccurs="0">
+   						<xs:complexType>
+   							<xs:sequence>
+   								<xs:element name="passengers">
+   									<xs:complexType>
+   										<xs:sequence>
+   											<xs:element name="passenger" type="com:PassengerSpecType" maxOccurs="unbounded"/>
+   										</xs:sequence>
+   									</xs:complexType>
+   								</xs:element>
+   								<xs:element name="fareInformation">
+   									<xs:complexType>
+   										<xs:sequence>
+   											<xs:element name="prices">
+   												<xs:complexType>
+   													<xs:sequence>
+   														<xs:element name="travelPassPrice" type="com:PassPriceType" maxOccurs="unbounded"/>
+   													</xs:sequence>
+   												</xs:complexType>
+   											</xs:element>
+   											<xs:element name="transactionFees" minOccurs="0" maxOccurs="1">
+   												<xs:complexType>
+   													<xs:sequence>
+   														<xs:element name="transactionFee" minOccurs="1" maxOccurs="unbounded" type="shop:ShoppingTransactionFeeType"/>
+   													</xs:sequence>
+   												</xs:complexType>
+   											</xs:element>
+   										</xs:sequence>
+   									</xs:complexType>
+   								</xs:element>
+								<xs:element name="passengerInformationRequired" minOccurs="0">
+									<xs:complexType>
+										<xs:sequence>
+											<xs:element name="passengerInformation" type="com:PassengerInformationType"
+														maxOccurs="unbounded"/>
+										</xs:sequence>
+									</xs:complexType>
+								</xs:element>
+   							</xs:sequence>
+   						</xs:complexType>
+   					</xs:element>
+   				</xs:sequence>
+   			</xs:extension>
+   		</xs:complexContent>
+   	</xs:complexType>
+
+	<xs:complexType name="ScheduleSearchRequestType">
+		<xs:complexContent>
+			<xs:extension base="com:BaseRequestType">
+				<xs:sequence>
+					<xs:element name="scheduleQuery" type="shop:ScheduleQueryType"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="ScheduleQueryType">
+			<xs:sequence>
+				<xs:element name="travelPointPair" type="shop:QueryTravelPointPairType" maxOccurs="1"/>
+			</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ScheduleSearchResponseType">
+		<xs:complexContent>
+			<xs:extension base="com:BaseResponseType">
+				<xs:sequence>
+					<xs:element name="results" minOccurs="0">
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="leg" type="com:LegType" maxOccurs="1"/>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+				</xs:sequence>
+                <xs:attribute name="source" use="optional">
+                    <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                            <xs:enumeration value="SUPPLY_CHANNEL"/>
+                            <xs:enumeration value="CACHE"/>
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:attribute>
+            </xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="QueryTravelPointPairType">
+		<xs:complexContent>
+			<xs:extension base="com:TravelPointPairType">
+				<xs:sequence>
+					<xs:element name="carrierRestrictions" minOccurs="0">
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="carrierRestriction" maxOccurs="unbounded">
+									<xs:complexType>
+										<xs:sequence>
+											<xs:element name="carrier" type="com:CarrierType"/>
+										</xs:sequence>
+										<xs:attribute name="type" use="required">
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:enumeration value="PREFERRED"/>
+													<xs:enumeration value="PERMITTED"/>
+													<xs:enumeration value="RESTRICTED"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:attribute>
+									</xs:complexType>
+								</xs:element>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+					<xs:element name="equipmentTypeRestrictions" minOccurs="0">
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="equipmentTypeRestriction" maxOccurs="unbounded">
+									<xs:complexType>
+										<xs:sequence>
+											<xs:element name="equipmentType" type="com:EquipmentTypeType"/>
+										</xs:sequence>
+										<xs:attribute name="type" use="required">
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:enumeration value="PERMITTED"/>
+													<xs:enumeration value="RESTRICTED"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:attribute>
+									</xs:complexType>
+								</xs:element>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+					<xs:element name="routingRestrictions" minOccurs="0" type="com:RoutingRestrictionsType"/>
+					<xs:element name="minimumConnectionTime" type="xs:duration" minOccurs="0"/>
+					<xs:element name="maximumConnectionTime" type="xs:duration" minOccurs="0"/>
+					<xs:element name="maximumPermittedConnections" type="xs:int" minOccurs="0"/>
+					<xs:element name="maximumTransitTime" type="xs:duration" minOccurs="0"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="ShoppingTransactionFeeType">
+		<xs:complexContent>
+			<xs:extension base="com:BaseTransactionFeeType">
+				<xs:sequence>
+					<xs:element name="description" type="xs:string" minOccurs="1" maxOccurs="1"/>
+					<xs:element name="applicableLegs" minOccurs="1" maxOccurs="1">
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="legIDRef" type="xs:IDREF" minOccurs="1" maxOccurs="unbounded"/>
+							</xs:sequence>
+							<xs:attribute name="minQuantity" type="xs:integer" use="required"/>
+							<xs:attribute name="maxQuantity" type="xs:integer" use="required"/>
+						</xs:complexType>
+					</xs:element>
+				</xs:sequence>
+				<xs:attribute name="mandatory" type="xs:boolean" use="required"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+</xs:schema>

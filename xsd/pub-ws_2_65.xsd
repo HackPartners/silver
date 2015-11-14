@@ -1,0 +1,465 @@
+<!--
+  ~ Copyright 2012, SilverRail Technologies, Inc. All rights reserved.
+  -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:pub="http://railgds.net/ws/publishing"
+           elementFormDefault="qualified"
+           targetNamespace="http://railgds.net/ws/publishing">
+
+    <xs:element name="dataRequest" type="pub:dataRequestType"/>
+    <xs:element name="dataResponse" type="pub:dataResponseType"/>
+
+    <xs:complexType name="BaseDataType">
+        <xs:attribute name="conversationToken" type="xs:string"/>
+        <xs:attribute name="dateTime" type="xs:dateTime"/>
+        <xs:attribute name="type" use="required">
+            <xs:simpleType>
+                <!-- These should be synced with values in PublishType -->
+                <xs:restriction base="xs:string">
+                    <xs:enumeration value="acceptableFop"/>
+                    <xs:enumeration value="amenity"/>
+                    <xs:enumeration value="fareQualifier"/>
+                    <xs:enumeration value="region"/>
+                    <xs:enumeration value="station"/>
+                    <xs:enumeration value="equipmentType"/>
+                    <xs:enumeration value="carrier"/>
+                    <xs:enumeration value="country"/>
+                    <xs:enumeration value="loyaltyCard"/>
+                    <xs:enumeration value="structure"/>
+                    <xs:enumeration value="stationRichContent"/>
+                    <xs:enumeration value="fareCodeApplicabilityRestriction"/>
+                    <xs:enumeration value="reservable"/>
+                    <xs:enumeration value="supplyChannelFareCode"/>
+                    <xs:enumeration value="marketingInformation"/>
+                    <xs:enumeration value="seatAttribute"/>
+                    <xs:enumeration value="seatPreference"/>
+                </xs:restriction>
+            </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="version" type="xs:string"/>
+    </xs:complexType>
+
+    <xs:complexType name="ParametersType">
+        <xs:sequence>
+            <xs:element name="selection" type="xs:string" minOccurs="1" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:simpleType name="DistributorCodeType">
+        <xs:restriction base="xs:string">
+            <xs:maxLength value="10"/>
+            <xs:minLength value="1"/>
+            <xs:pattern value="[a-zA-Z0-9]+"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="PointOfSaleCodeType">
+        <xs:restriction base="xs:string">
+            <xs:maxLength value="2"/>
+            <xs:minLength value="2"/>
+            <xs:pattern value="[A-Z][A-Z]"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="ChannelCodeType">
+        <xs:restriction base="xs:string">
+            <xs:minLength value="1"/>
+            <xs:maxLength value="10"/>
+            <xs:pattern value="[a-zA-Z0-9]+"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+
+    <xs:complexType name="countryType">
+        <xs:attribute name="countryCode" type="xs:string" use="required"/>
+        <xs:attribute name="continentCode" type="xs:string" use="required"/>
+        <xs:attribute name="countryCallingCode" type="xs:string" use="optional"/>
+        <xs:attribute name="countryName" type="xs:string" use="required"/>
+    </xs:complexType>
+
+
+    <xs:simpleType name="AgencyCodeType">
+        <xs:restriction base="xs:string">
+            <xs:maxLength value="10"/>
+            <xs:minLength value="1"/>
+            <xs:pattern value="[a-zA-Z0-9]+"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="CompanyCodeType">
+        <xs:restriction base="xs:string">
+            <xs:minLength value="1"/>
+            <xs:maxLength value="10"/>
+            <xs:pattern value="[a-zA-Z0-9]+"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:complexType name="dataRequestType">
+        <xs:complexContent>
+            <xs:extension base="pub:BaseDataType">
+                <xs:sequence>
+                    <xs:element name="parameters" type="pub:ParametersType" minOccurs="0" maxOccurs="1"/>
+                </xs:sequence>
+                <xs:attribute name="changedAfter" type="xs:date"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="dataResponseType">
+        <xs:complexContent>
+            <xs:extension base="pub:BaseDataType">
+                <xs:sequence>
+                    <xs:element name="requestStatus" type="pub:RequestStatusType"/>
+                    <xs:element name="acceptableFop" type="pub:acceptableFopType" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element name="amenity" type="pub:amenityType" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element name="country" type="pub:countryType" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element name="fareQualifier" type="pub:fareQualifierType" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element name="region" type="pub:regionType" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element name="station" type="pub:stationType" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element name="marketingInformation" type="pub:marketingInformationType" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element name="equipmentType" type="pub:equipmentTypeType" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element name="carrier" type="pub:carrierType" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element name="loyaltyCard" type="pub:loyaltyCardType" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element name="structure" type="pub:structure" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element name="stationRichContent" type="pub:stationRichContent" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element name="fareCodeApplicabilityRestriction" type="pub:fareCodeApplicabilityRestriction" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element name="reservable" type="pub:reservable" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element name="supplyChannelFareCode" type="pub:supplyChannelFareCode" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element name="seatAttribute" type="pub:seatAttribute" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element name="seatPreference" type="pub:seatPreference" minOccurs="0" maxOccurs="unbounded"/>
+                </xs:sequence>
+                <xs:attribute name="lastChanged" type="xs:date"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="fareCodeApplicabilityRestriction">
+        <xs:attribute name="value" type="xs:string" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="reservable">
+        <xs:attribute name="value" type="xs:string" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="supplyChannelFareCode">
+        <xs:attribute name="supplyChannelCode" type="xs:string" use="required"/>
+        <xs:attribute name="code" type="xs:string" use="required"/>
+        <xs:attribute name="active" type="xs:string" use="required"/>
+        <xs:attribute name="effectiveStartDate" type="xs:date" use="required"/>
+        <xs:attribute name="cabinClass" type="xs:string" use="required"/>
+        <xs:attribute name="serviceClass" type="xs:string" use="required"/>
+        <xs:attribute name="fareClass" type="xs:string" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="seatAttribute">
+        <xs:attribute name="code" type="xs:string" use="required"/>
+        <xs:attribute name="description" type="xs:string" use="required"/>
+        <xs:attribute name="category" type="xs:string" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="seatPreference">
+        <xs:attribute name="code" type="xs:string" use="required"/>
+        <xs:attribute name="description" type="xs:string" use="required"/>
+        <xs:attribute name="category" type="xs:string" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="marketingInformationType">
+        <xs:attribute name="serviceCode" type="xs:string" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="stationRichContent">
+        <xs:sequence>
+            <xs:element name="station" type="pub:stationRichContent_Station" minOccurs="1" maxOccurs="unbounded" />
+        </xs:sequence>
+        <xs:attribute name="lastChanged" type="xs:string" use="required"/>
+        <xs:attribute name="countryCode" type="xs:string" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="stationRichContent_Station">
+        <xs:sequence>
+            <xs:element name="code" type="xs:string" minOccurs="1" maxOccurs="1" />
+            <xs:element name="ticketPrintedName" type="xs:string" minOccurs="1" maxOccurs="1" />
+            <xs:element name="aliasStationCode" type="xs:string" minOccurs="0" maxOccurs="1" />
+            <xs:element name="phone" type="xs:string" minOccurs="0" maxOccurs="1" />
+            <xs:element name="addressLine1" type="xs:string" minOccurs="0" maxOccurs="1" />
+            <xs:element name="addressLine2" type="xs:string" minOccurs="0" maxOccurs="1" />
+            <xs:element name="addressLine3" type="xs:string" minOccurs="0" maxOccurs="1" />
+            <xs:element name="addressCity" type="xs:string" minOccurs="1" maxOccurs="1" />
+            <xs:element name="addressProvince" type="xs:string" minOccurs="0" maxOccurs="1" />
+            <xs:element name="addressPostalCode" type="xs:string" minOccurs="0" maxOccurs="1" />
+            <xs:element name="iataStationCode" type="xs:string" minOccurs="1" maxOccurs="1" />
+            <xs:element name="nationalLocationCode" type="xs:string" minOccurs="0" maxOccurs="1" />
+            <xs:element name="trainOperatingCompany" type="xs:string" minOccurs="1" maxOccurs="1" />
+            <xs:element name="phoneInternal" type="xs:string" minOccurs="0" maxOccurs="1" />
+            <xs:element name="ticketIssuingSystem" type="xs:string" minOccurs="1" maxOccurs="1" />
+            <xs:element name="ticketOffice" type="xs:string" minOccurs="1" maxOccurs="1" />
+            <xs:element name="ticketVendingMachine" type="xs:string" minOccurs="1" maxOccurs="1" />
+            <xs:element name="genericAttribute" type="pub:stationRichContent_GenericAttribute" minOccurs="1" maxOccurs="unbounded" />
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="stationRichContent_GenericAttribute">
+        <xs:sequence>
+            <xs:element name="structureData" type="pub:stationRichContent_StructureData" minOccurs="1" maxOccurs="unbounded" />
+        </xs:sequence>
+        <xs:attribute name="gcxCode" type="xs:string" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="stationRichContent_StructureData">
+        <xs:sequence>
+            <xs:element name="text" type="pub:stationRichContent_text" minOccurs="0" maxOccurs="unbounded" />
+            <xs:element name="schedule" type="pub:stationRichContent_schedule" minOccurs="0" maxOccurs="unbounded" />
+            <xs:element name="list" type="pub:stationRichContent_list" minOccurs="0" maxOccurs="unbounded" />
+        </xs:sequence>
+        <xs:attribute name="attributeCode" type="xs:string" use="required"/>
+        <xs:attribute name="type" type="pub:structureAttributeType" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="stationRichContent_text">
+        <xs:sequence>
+            <xs:element name="value" type="pub:stationRichContent_textValue"  minOccurs="0" maxOccurs="unbounded" />
+        </xs:sequence>
+        <xs:attribute name="subCode" type="xs:string" use="required"/>
+    </xs:complexType>
+
+    <xs:simpleType name="scheduleType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="SUNDAY"/>
+            <xs:enumeration value="MONDAY"/>
+            <xs:enumeration value="TUESDAY"/>
+            <xs:enumeration value="WEDNESDAY"/>
+            <xs:enumeration value="THURSDAY"/>
+            <xs:enumeration value="FRIDAY"/>
+            <xs:enumeration value="SATURDAY"/>
+            <xs:enumeration value="EVERYDAY"/>
+            <xs:enumeration value="WEEKDAYS"/>
+            <xs:enumeration value="WEEKENDS"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="hoursType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="open-period"/>
+            <xs:enumeration value="all-day"/>
+            <xs:enumeration value="unspecified" />
+        </xs:restriction>
+    </xs:simpleType>
+
+
+    <xs:complexType name="stationRichContent_schedule">
+        <xs:attribute name="scheduleType" type="pub:scheduleType" use="required"/>
+        <xs:attribute name="hoursType" type="pub:hoursType" use="required"/>
+        <xs:attribute name="startTime" type="xs:string" />  <!-- TODO xs:time -->
+        <xs:attribute name="endTime" type="xs:string" />  <!-- TODO xs:time -->
+    </xs:complexType>
+
+
+    <xs:complexType name="stationRichContent_textValue" mixed="true" >
+        <!--<xs:sequence>-->
+            <!--<xs:element name="text" type="pub:stationRichContent_text" minOccurs="0" maxOccurs="unbounded" />-->
+        <!--</xs:sequence>-->
+        <xs:attribute name="locale" type="xs:string" use="required"/>
+    </xs:complexType>
+
+
+    <xs:complexType name="stationRichContent_list">
+        <xs:attribute name="subCode" type="xs:string" />
+        <xs:attribute name="flag" type="xs:boolean" />
+    </xs:complexType>
+
+    <xs:complexType name="structure">
+        <xs:sequence>
+            <xs:element name="genericAttribute" type="pub:structure_GenericAttribute" minOccurs="1" maxOccurs="unbounded" />
+        </xs:sequence>
+        <xs:attribute name="code" type="xs:string" use="required"/>
+        <xs:attribute name="locale" type="xs:string" use="required"/>
+        <xs:attribute name="lastChanged" type="xs:string" use="required"/>
+        <xs:attribute name="countryCode" type="xs:string" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="structure_GenericAttribute">
+        <xs:sequence>
+            <xs:element name="structureAttribute" type="pub:structureAttribute" minOccurs="0" maxOccurs="unbounded" />
+        </xs:sequence>
+        <xs:attribute name="gcxCode" type="xs:string" use="required"/>
+        <xs:attribute name="name" type="xs:string" use="required"/>
+    </xs:complexType>
+
+    <xs:simpleType name="structureAttributeType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="list"/>
+            <xs:enumeration value="text"/>
+            <xs:enumeration value="schedule"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:complexType name="structureAttribute">
+        <xs:sequence>
+            <xs:element name="label" type="pub:label" minOccurs="0" maxOccurs="unbounded" />
+        </xs:sequence>
+        <xs:attribute name="type" type="pub:structureAttributeType" use="required"/>
+        <xs:attribute name="code" type="xs:string" use="required"/>
+        <xs:attribute name="name" type="xs:string" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="label">
+        <xs:attribute name="subCode" type="xs:string" use="required"/>
+        <xs:attribute name="name" type="xs:string" use="required"/>
+    </xs:complexType>
+
+
+
+    <xs:complexType name="RequestStatusType">
+        <xs:sequence>
+            <xs:element name="success" type="xs:boolean"/>
+            <xs:element name="statusMessages" minOccurs="0">
+                <xs:complexType>
+                    <xs:complexContent>
+                        <xs:extension base="pub:StatusMessages">
+                            <xs:sequence>
+                                <xs:element name="statusMessage" type="pub:StatusMessageType"
+                                            maxOccurs="unbounded"/>
+                            </xs:sequence>
+                        </xs:extension>
+                    </xs:complexContent>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+        <xs:attribute name="systemId" type="xs:string"/>
+    </xs:complexType>
+    <xs:complexType name="StatusMessages"/>
+    <xs:complexType name="StatusMessageType">
+        <xs:sequence>
+            <xs:element name="code" type="xs:string"/>
+            <xs:element name="message" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="acceptableFopType">
+        <xs:sequence>
+            <xs:element name="validCardLength" type="pub:acceptableFopValidCardLengthType" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:attribute name="code" type="xs:string" use="required"/>
+        <xs:attribute name="name" type="xs:string" use="required"/>
+        <xs:attribute name="paymentMethod" type="xs:string" use="required"/>
+        <xs:attribute name="securityCodeLength" type="xs:integer" use="required"/>
+        <xs:attribute name="expiryDateRequired" type="xs:boolean" use="required"/>
+        <xs:attribute name="issueSeriesRequired" type="xs:boolean" use="required"/>
+        <xs:attribute name="startDateRequired" type="xs:boolean" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="acceptableFopValidCardLengthType">
+        <xs:attribute name="value" type="xs:integer" use="required"/>
+    </xs:complexType>
+
+
+    <xs:complexType name="amenityType">
+        <xs:attribute name="code" type="xs:string" use="required"/>
+        <xs:attribute name="description" type="xs:string" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="fareQualifierType">
+        <xs:attribute name="program" type="xs:string" use="required"/>
+        <xs:attribute name="type" type="xs:string" use="required"/>
+        <xs:attribute name="description" type="xs:string" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="regionType">
+        <xs:sequence>
+            <xs:element name="country" type="pub:regionCountryType" minOccurs="1" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:attribute name="code" type="xs:string" use="required"/>
+        <xs:attribute name="name" type="xs:string" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="regionCountryType">
+        <xs:attribute name="code" type="xs:string"/>
+    </xs:complexType>
+
+    <xs:complexType name="stationType">
+        <xs:sequence>
+            <xs:element name="supplier" type="pub:supplierType" minOccurs="1" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:attribute name="code" type="xs:string" use="required"/>
+        <xs:attribute name="type" type="xs:string" use="required"/>
+        <xs:attribute name="name" type="xs:string" use="required"/>
+        <xs:attribute name="mainStation" type="xs:string" use="required"/>
+        <xs:attribute name="iataCode" type="xs:string"/>
+        <xs:attribute name="countryCode" type="xs:string"/>
+        <xs:attribute name="timeZone" type="xs:string" use="required"/>
+        <xs:attribute name="latitude" type="xs:string"/>
+        <xs:attribute name="longitude" type="xs:string"/>
+        <xs:attribute name="city" type="xs:string"/>
+        <xs:attribute name="stateProvinceCode" type="xs:string"/>
+        <xs:attribute name="itineraryStation" type="pub:stationAPIType"/>
+        <xs:attribute name="fareStation" type="pub:stationAPIType"/>
+    </xs:complexType>
+
+    <xs:complexType name="supplierType">
+        <xs:sequence>
+            <xs:choice>
+                <xs:element name="memberStation" type="pub:memberStationType" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element name="groupStation" type="pub:groupStationType" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:choice>
+        </xs:sequence>
+        <xs:attribute name="source" use="required">
+            <xs:simpleType>
+                <xs:restriction base="xs:string">
+                    <xs:enumeration value="AMT"/>
+                    <xs:enumeration value="ATOC"/>
+                    <xs:enumeration value="BENE"/>
+                    <xs:enumeration value="CWT"/>
+                    <xs:enumeration value="DBB"/>
+                    <xs:enumeration value="EFNR"/>
+                    <xs:enumeration value="Linkon"/>
+                    <xs:enumeration value="REN"/>
+                    <xs:enumeration value="TRI"/>
+                    <xs:enumeration value="VIA"/>
+                </xs:restriction>
+            </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="type" >
+            <xs:simpleType>
+                <xs:restriction base="xs:string">
+                    <xs:enumeration value="CODE"/>
+                    <xs:enumeration value="ALIAS"/>
+                </xs:restriction>
+            </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="codeType" type="xs:string"/>
+        <xs:attribute name="typeName" type="xs:string"/>
+        <xs:attribute name="alias" type="xs:string"/>
+    </xs:complexType>
+
+    <xs:complexType name="memberStationType">
+        <xs:attribute name="code" type="xs:string" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="groupStationType">
+        <xs:attribute name="code" type="xs:string" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="equipmentTypeType">
+        <xs:attribute name="code" type="xs:string" use="required"/>
+        <xs:attribute name="description" type="xs:string" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="carrierType">
+        <xs:attribute name="code" type="xs:string" use="required"/>
+        <xs:attribute name="name" type="xs:string" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="loyaltyCardType">
+        <xs:attribute name="marketingCarrier" type="xs:string"/>
+        <xs:attribute name="program" type="xs:string"/>
+        <xs:attribute name="description" type="xs:string"/>
+    </xs:complexType>
+
+    <xs:simpleType name="stationAPIType">
+        <xs:restriction base="xs:normalizedString">
+            <xs:enumeration value="YES"/>
+            <xs:enumeration value="NO"/>
+            <xs:enumeration value="OUTPUT_ONLY"/>
+        </xs:restriction>
+    </xs:simpleType>
+</xs:schema>
