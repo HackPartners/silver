@@ -3,7 +3,9 @@ from silver import *
 import pyxb
 from datetime import datetime
 
-sc = SilverCore("HackTrain", "GB", "CH2", "/Users/bloomberglondonrd1/.ssh/certificates/hacktrain.nokey.pem", "/Users/bloomberglondonrd1/.ssh/certificates/hacktrain.key")
+cert = "/Users/bloomberglondonrd1/.ssh/certificates/hacktrain.nokey.pem"
+key = "/Users/bloomberglondonrd1/.ssh/certificates/hacktrain.key"
+sc = SilverCore("HackTrain", "GB", "CH2", cert, key)
 
 # =======================================================
 # ===================== Fares query =====================
@@ -232,6 +234,8 @@ print booking_result.requestStatus.success # True
 print booking_result.recordLocator # B-HACKTRAIN-IKS000262
 print booking_result.lastHoldDateTime # 2015-11-15T15:49:09Z
 
+# Store record locator to add payment, add ticket option, and confirm booking
+# See the other examples for this
 record_locator = booking_result.recordLocator
 
 
@@ -271,9 +275,6 @@ print payment_response.paymentToken # Nl6qpzWfQiylKDaExw2W/g==
 payment_token = payment_response.paymentToken
 
 
-
-
-
 # =======================================================
 # ==================== Add Delivery =====================
 # =======================================================
@@ -289,7 +290,7 @@ bu = BookingUpdate(
 
 booking_update = sc.update_booking(bu)
 
-booking_update.toxml()
+print booking_update.requestStatus.success # True
 
 # =======================================================
 # =================== Confirm Booking ===================
@@ -307,7 +308,7 @@ b = BookingConfirmation(
 
 booking_confirm = sc.confirm_booking(b)
 
-print booking_confirm.toxml()
+print booking_confirm.requestStatus.success # True
 
 
 
