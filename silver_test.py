@@ -203,8 +203,7 @@ fc1 = FareCode(
 # Creating passenger reference with one fare code (As there is 1 travel segment)
 pr1 = PassengerReference(p1, PASSENGER_TYPE.A, [fc1])
 
-# The FarePrice breakdown for the total ticketable fare cost, 
-# which in this case it's only one item for the breakdown
+# The FarePrice breakdown for the total ticketable fare cost 
 price1 = FarePrice(319.52, "TICKET", "USD")
 
 tf1 = TicketableFare(
