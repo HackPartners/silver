@@ -9,7 +9,7 @@ setup(
   url = 'https://github.com/HackTrain/silver',
   download_url = 'https://github.com/HackTrain/silver/tarball/0.2', 
   keywords = ['silvercore', 'silver', 'hackpartners', 'hacktrain', 'hack', 'partners'], 
-  include_package_data=True,
+  package_data={'silver': ['silverraw/*', '*']},
   install_requires=[
         "pyxb",
         "suds"
