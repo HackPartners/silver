@@ -22,6 +22,28 @@ class FARE_FILTER(Enum):
     OPEN = "OPEN"
     CHEAPEST_OPEN = "CHEAPEST_OPEN"
 
+class CONTACT_TYPE(Enum):
+    HOME = "HOME"
+    BUSINESS = "BUSINESS"
+    UNKNOWN = "UNKNOWN"
+
+class CONTACT_MEDIUM(Enum):
+    PHONE = "PHONE"
+    EMAIL = "EMAIL"
+
+class PASSENGER_TYPE(Enum):
+    C = "C"
+
+class ContactInfo:
+    """
+    Represents contact information for a passenger
+    """
+
+    def __init__(self, type, medium, info):
+        self.type = type
+        self.medium = medium
+        self.info = info
+
 class Passenger:
     """Represents a passenger that will be on the relevant trip.
 
@@ -42,12 +64,22 @@ class Passenger:
         Passenger.passenger_count = Passenger.passenger_count+1
         return "PAX_" + str(Passenger.passenger_count)
 
-    def __init__(self, age=None, id=None, contact_info=[]):
+    def __init__(self, 
+                age=None, 
+                id=None,
+                first_name=None,
+                last_name=None,
+                passenger_type=None,
+                contact_info=[]):
         """Initializes passenger with attributes given
 
         Args:
            age (int):  The age of the passenger as integer.
            id (str):  The id of passenger - if not given, it's automatically generated.
+           first_name (str):  First name of passenger.
+           last_name (str):  Last name of passenger.
+           passenger_type (PASSENGER_TYPE):  The class type of passenger travelling.
+           contact_info (ContactInfo[]):  The contact information of the passenger.
         """
 
         if not id:
@@ -56,8 +88,14 @@ class Passenger:
             self.id = id
         
         self.age = age
+        self.first_name = first_name
+        self.last_name = last_name
+        self.passenger_type = passenger_type
         self.contact_info = contact_info
 
+    def add_contact(self, contact_info):
+        assert(isinstance(contact_info, ContactInfo))
+        self.contact_info.append(contact_info)
 
 class TravelPoint:
     """
@@ -85,6 +123,9 @@ class TravelPoint:
 
 
 class FareSearch:
+    """
+    Represents an object which contains all required fields to perform a successful fare search
+    """
 
     def __init__(self, travel_points=[], 
                         fare_filter=FARE_FILTER.CHEAPEST,
@@ -96,16 +137,167 @@ class FareSearch:
            travel_points (TravelPoint[]):  List of travel points.
            fare_filter (FARE_FILTER):  Fare filter type.
            passengers (Passenger[]):  List of passengers travelling.
-           specs (TRAVEL_SPECS[]):  List of travel specifications.
+           specs (TRAVEL_SPECS[]):  [Not supported yet] List of travel specifications.
         """
 
         self.travel_points = travel_points
         self.fare_filter = fare_filter
         self.passengers = passengers
+
+        # TODO: Specs are not supported yet
         self.specs = specs
+
+class Leg:
+    """
+    Represents a travel leg with its respective travel segments
+    """
+
+    def __init__(self, id, tarvel_segments):
+        """FUNC_DESC.
+
+        Args:
+            id (str): The id of the leg
+            trave_segments (TravelSegment[]): An array of travel segments.
+
+        """
+
+        self.id = id
+        self.tarvel_segments = tarvel_segments
+
+class TravelSegment:
+    """
+    This class represents a travel segment for a specific leg
+    """
+
+    def __init__(self, 
+                    id = None,
+                    sequence = None,
+                    origin = None,
+                    destination = None,
+                    departure = None,
+                    arrival = None,
+                    designator = None,
+                    marketing_carrier = None,
+                    operating_carrier = None,
+                    equipment_type = None,
+                    equipment_type_str = None):
+        """
+
+        Args:
+            id (str): The identifier of the travel segment.
+            sequence (int): The ordering sequence number of the travel segment
+            origin (str): The origin of the travel segment.
+            destination (str): The destination of the travel segment.
+            departure (DateTime): The datetime of departure of the travel segment.
+            arrival (DateTime): The datetime of arrival of the travel segment.
+            designator (str): The designator for the travel segment.
+            marketing_carrier (str): The marketign carrier for the travel segment.
+            operating_carrier (str): The operational carrier for the travel segment.
+            equipment_type (str): The type of equipment for the travel segment defined by the silvercore equipment types.
+            equipment_type_str (str): The printable string version of the equipment type.
+
+        """
+
+        self.id = id
+        self.sequence = sequence
+        self.origin = origin
+        self.destination = destination
+        self.departure = departure
+        self.arrival = arrival
+        self.designator = designator
+        self.marketing_carrier = marketing_carrier
+        self.operating_carrier = operating_carrier
+        self.equipment_type = equipment_type
+        self.equipment_type_str = equipment_type_str
+
+class FareCode:
+    """
+    Represents a fare code for the respective Ticketable Fare
+    """
+
+    def __init__(self, 
+                    code = None,
+                    service_class = None,
+                    travel_segment_id = None,
+                    cabin_class = None,
+                    fare_display_name = None):
+        """
+        Args:
+            code (str): The code that identifies the fare code
+            service_class (str): The type of service class
+            travel_segment_id (str): The travel segment it references
+            cabin_class (str): The class of the cabin for the travel segment
+            fare_display_name (str): The display name for the fare code
+
+        """
+
+        self.code = code
+        self.service_class = service_class
+        self.travel_segment_id = travel_segment_id
+        self.cabin_class = cabin_class
+        self.fare_display_name = fare_display_name
+
+class TicketableFare:
+    """ 
+    Represents an individual section of a fare total, containing a set of fare codes and passengers
+    """
+
+    def __init__(self, 
+                    price = None,
+                    currency = None,
+                    fare_codes = [],
+                    passengers = []):
+        """
+        Args:
+            price (int): The total amount of the ticketable fare.
+            currency (str): The currency of the fare.
+            fare_codes (FareCode[]): An array of fare codes for this ticketable fare.
+            passengers (Passenger[]): An array of passengers for this ticketable fare.
+
+        """
+
+        self.price = price
+        self.currency = currency
+        self.fare_codes = fare_codes
+        self.passengers = passengers
+
+class FaresTotal:
+    """
+    This class represents a fare for a specific leg, with specific segments given
+    """
+
+    def __init__(self, 
+                    id = None,
+                    currency = None,
+                    price = None,
+                    expiration = None,
+                    ticketable_fares = [],
+                    legs = []):
+        """
+
+        Args:
+            id (str): The identifier for this fare
+            currency (str): the currency for the fare amount
+            price (int): The of the total cost fare 
+            expiration (DateTime): The date of expiration for the fare
+            ticketable_fares (TicketableFare[]): Array of ticketable fares comprising this fare
+            legs (Leg[]): Array of legs that this fare refers to, minimum 1.
+
+        """
+
+        self.id = id
+        self.currency = currency
+        self.total_amount = total_amount
+        self.leg_id = leg_id
+        self.expiration = expiration
+        self.segments = segments
 
 
 class HTTPSClientAuthHandler(urllib2.HTTPSHandler):
+    """ 
+    This class handles authentication in the secure ssl tunnel created with the given PEM certificate and RSA key
+    """
+
     def __init__(self, key, cert):
         urllib2.HTTPSHandler.__init__(self)
         self.key = key
@@ -123,6 +315,10 @@ class HTTPSClientAuthHandler(urllib2.HTTPSHandler):
                                        cert_file=self.cert)
 
 class HTTPSClientCertTransport(HttpTransport):
+    """ 
+    This class creates an SSL tunnel to establish the secure connection between the silverclient and silvercore API
+    """
+
     def __init__(self, key, cert, *args, **kwargs):
         HttpTransport.__init__(self, *args, **kwargs)
         self.key = key
@@ -210,7 +406,6 @@ class SilverSoap:
         # If anyone can submit a pull request to pyxb to fix it, or 
         # find a neater walkaround, let's do it.
         xml = xml.replace(xml_func + ">", "ns3:" + xml_func + ">")
-        print xml
 
         # Call the relevant SilverCore function with the raw XML given 
         result = getattr(self.client.service, api_func)(__inject={"msg": xml})
@@ -354,6 +549,17 @@ class SilverCore(SilverSoap):
         return self._search_fare(fare_query)
 
 
+    def create_booking(self, fares, passengers):
+        """Creates a booking with the fares and passengers given, and returns a response object
+
+        Args:
+            fares (FareTotal[]): An array of fares chosen to book.
+            passengers (Passenger[]): An array of passengers that will be present on each booking.
+
+        Returns:
+            TYPE. DESC::
+
+        """
 
 
 

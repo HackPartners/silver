@@ -1,5 +1,5 @@
 from silverraw import silvershop, silvercom, silverbook, silvercore
-from silver import SilverCore, Passenger, TravelPoint, FareSearch, FARE_FILTER
+from silver import SilverCore, Passenger, TravelPoint, FareSearch, FARE_FILTER, CONTACT_TYPE, FareTotal, TravelSegment
 import pyxb
 from datetime import datetime
 
@@ -20,13 +20,7 @@ tp1 = TravelPoint(
 fq = FareSearch(
         travel_points = [tp1],
         fare_filter = FARE_FILTER.CHEAPEST,
-        passengers = [p1, p2],
-        specs = [
-            "reservations",
-            "accommodations",
-            "onboardServices",
-            "localServices",        
-        ])
+        passengers = [p1, p2])
 
 fares_result = sc.search_fare(fq)
 
@@ -159,7 +153,7 @@ for l in fr.legs.leg:
                 print r.description
                 print r.priceType
                 print r.applicableOrderStatus
-                
+
                 if r.penalty:
                     print r.penalty.currency
                     print r.penalty.value()
@@ -170,4 +164,56 @@ for l in fr.legs.leg:
 # ======================= Booking =======================
 # =======================================================
 
+p1 = Passenger(
+    passenger_id="PAX_SPEC_0",
+    age=30,
+    first_name="Jane",
+    last_name="Smith",
+    passenger_type=PASSENGER_TYPE.C)
 
+p1.add_contact(ContactInfo(CONTACT_TYPE.HOME, CONTACT_MEDIUM.PHONE, "123456789"))
+p1.add_contact(ContactInfo(CONTACT_TYPE.BUSINESS, CONTACT_MEDIUM.EMAIL, "lol@hack.com"))
+
+ts1 = TravelSegment(
+        id = "LS_1_2_TS_0", 
+        sequence = 0,
+        origin = "GBRDG",
+        destination = "GBQQP",
+        departure = "2015-12-07T10:07:00",
+        arrival = "2015-12-07T10:37:00",
+        designator = "GW4205",
+        marketing_carrier = "FirstGrtWest",
+        operating_carrier = "FirstGrtWest",
+        equipment_type = "ICY",
+        equipment_type_str = "Inter-City")
+
+leg1 = Leg(
+    id="LS_1_2",
+    travel_segments=[ts1])
+
+fc1 = FareCode(
+    code="IWC-SOS-00200-STD-1",
+    service_class="THIRD",
+    travel_segment_id = "LS_1_2_TS_1",
+    cabin_class="Standard",
+    fare_display_name="Anytime Single")
+
+tf1 = TicketableFare(
+        price= 48.50,
+        currency="GBP",
+        fare_codes=[fc1],
+        passengers=[p1])
+
+f1 = FareTotal(
+        id = "PRICE_P_1_23", 
+        currency = "GBP", 
+        price = 48.50, 
+        expiration = "2015-10-27T15:50:33Z",
+        ticketable_fares = [tf1],
+        legs = [leg1])
+
+fares = [f1]
+passengers = [p1]
+
+# Run booking request
+booking_result = sc.create_booking(fares, passengers)
