@@ -621,6 +621,7 @@ class SilverSoap:
         # If anyone can submit a pull request to pyxb to fix it, or 
         # find a neater walkaround, let's do it.
         xml = xml.replace(xml_func + ">", "ns3:" + xml_func + ">")
+        print xml
 
         # Call the relevant SilverCore function with the raw XML given 
         client_found = getattr(self, soap_client)
@@ -699,6 +700,71 @@ class SilverSoap:
 
         return response
 
+    def _create_booking_from_response(self, legs, fares, passengers, parameters=[], response_specs=[]):
+        """Creates a silverraw request to send to SilverCore API with form the legs and fares given from the previous faresearch query, and passengers given.
+
+        Args:
+            legs (silverraw.Leg[]): An array of SilverRaw Leg objects chosen to book.
+            fares (silverraw.Fare[]): An array of SilverRaw Fare objects chosen to book.
+            passengers (Passenger[]): An array of passengers that will be present on each booking.
+            parameters (CREATE_BOOKING_PARAMS[]): Array of parameters to pass the create booking request  (NOT SUPPORTED YET).
+            response_specs (CREATE_BOOKING_SPECS[]): Array of specs for the response from the SilverCore API (NOT SUPPORTED YET).
+
+        Returns:
+            silverraw.createBookingResponse. Returns a createBookingResponse object::
+
+        """
+        
+
+        cb = silverbook.createBookingRecordRequest()
+        
+        # Obtaining the context
+        cb.context = self._get_xml_context()
+
+        # TODO: Add support for parameters        
+        cb.parameters = b()
+        cb.parameters.priceAcceptance = b()
+        cb.parameters.priceAcceptance.acceptAny = True
+
+        # Adding point to point prices
+        cb.prices = b()
+        cb.prices.pointToPointPrice.extend(fares)
+            
+        # Adding all legs for trip
+        cb.legSolutions = b()
+        cb.legSolutions.legSolution.extend(legs)
+
+        # Adding passengers
+        cb.passengers = b()
+        for idx1, passenger in enumerate(passengers):
+
+            cb.passengers.passenger.append(b())
+
+            p = cb.passengers.passenger[idx1]
+
+            p.passengerID           = passenger.id
+            p.nameFirst             = passenger.first_name
+            p.nameLast              = passenger.last_name
+            p.ageAtTimeOfTravel     = 40
+
+            p.contactInformation = b()
+
+            # Adding all contact information available for passenger
+            for contact in passenger.contact_info:
+                p.contactInformation.contact.append(b(
+                        contactType=contact.type.value,
+                        contactMedium=contact.medium.value, 
+                        contactInfo=contact.info))
+
+        # Send create booking request
+        response = self._silver_send(
+            "book_client",
+            "CreateBookingRecord", 
+            "createBookingRecordRequest", 
+            cb)        
+
+        return response
+
     def _create_booking(self, fares, passengers, parameters, response_specs):
         """Creates the relevant silverraw objects and sends a create booking request to the silvercore api.
 
@@ -723,6 +789,7 @@ class SilverSoap:
         cb.parameters.priceAcceptance = b()
         cb.parameters.priceAcceptance.acceptAny = True
 
+        # TODO: Add support for response_spec
         # if len(response_specs):
         #     cb.responseSpec = b()
         #     for r in response_specs:
@@ -1052,6 +1119,22 @@ class SilverCore(SilverSoap):
         """
 
         return self._create_booking(fares, passengers, parameters, response_specs)
+
+    def create_booking_from_response(self, legs, fares, passengers, parameters=[], response_specs=[]):
+        """Creates a booking with form the legs and fares given from the previous faresearch query, and passengers given.
+
+        Args:
+            legs (silverraw.Leg[]): An array of SilverRaw Leg objects chosen to book.
+            fares (silverraw.Fare[]): An array of SilverRaw Fare objects chosen to book.
+            passengers (Passenger[]): An array of passengers that will be present on each booking.
+            parameters (CREATE_BOOKING_PARAMS[]): Array of parameters to pass the create booking request  (NOT SUPPORTED YET).
+            response_specs (CREATE_BOOKING_SPECS[]): Array of specs for the response from the SilverCore API (NOT SUPPORTED YET).
+
+        Returns:
+            silverraw.createBookingResponse. Returns a createBookingResponse object::
+
+        """
+        return self._create_booking_from_response(legs, fares, passengers, parameters, response_specs)
 
     def add_payment(self, payment, response_specs=[]):
         """Adds a form of payment to an existing booking referenced throuhg a record locator object

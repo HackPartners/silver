@@ -12,7 +12,6 @@ sc = SilverCore("HackTrain", "GB", "CH2", cert, key)
 # =======================================================
 
 p1 = Passenger(age=30)
-p2 = Passenger(age=15)
 
 tp1 = TravelPoint(
     origin="GBQQU", 
@@ -22,7 +21,7 @@ tp1 = TravelPoint(
 fq = FareSearch(
         travel_points = [tp1],
         fare_filter = FARE_FILTER.CHEAPEST,
-        passengers = [p1, p2])
+        passengers = [p1])
 
 fares_result = sc.search_fare(fq)
 
@@ -162,9 +161,42 @@ for l in fr.legs.leg:
 
 
 
+
+
 # =======================================================
-# ======================= Booking =======================
+# ============= Booking From Fares Found ================
 # =======================================================
+
+p1 = Passenger(
+    id="PAX_SPEC_0",
+    age=30,
+    first_name="Jane",
+    last_name="Smith")
+
+p1.add_contact(ContactInfo(CONTACT_TYPE.UNKNOWN, CONTACT_MEDIUM.PHONE, "123456789"))
+p1.add_contact(ContactInfo(CONTACT_TYPE.BUSINESS, CONTACT_MEDIUM.PHONE, "123456789"))
+p1.add_contact(ContactInfo(CONTACT_TYPE.BUSINESS, CONTACT_MEDIUM.EMAIL, "jsmith@email.com"))
+
+passengers_chosen = [p1]
+
+# Chose the legs for the journey
+legs = [fares_result.results.legs.leg[0].legSolutions.legSolution[0]]
+
+# Select fares chosen
+fares = [fares_result.results.fareInformation.prices.pointToPointPrice[0]]
+
+# Select passengers for the booking
+passengers = [p1]
+
+# Run booking request
+booking_result = sc.create_booking_from_response(legs, fares, passengers)
+
+print booking_result.toxml()
+
+# =======================================================
+# =============== Booking From Python ===================
+# =======================================================
+
 
 p1 = Passenger(
     id="PAX_SPEC_0",
