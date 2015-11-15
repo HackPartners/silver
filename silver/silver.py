@@ -1,4 +1,4 @@
-from silverraw import silvershop, silvercom, silverbook, silvercore
+from .silverraw import silvershop, silvercom, silverbook, silvercore
 
 import os
 

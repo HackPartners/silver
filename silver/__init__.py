@@ -1,2 +1,2 @@
-from silver import *
 from . import silverraw
+from silver import *

@@ -2,16 +2,4 @@
 setup.cfg
 setup.py
 silver/__init__.py
-silver/__init__.pyc
 silver/silver.py
-silver/silver.pyc
-silver/silverraw/__init__.py
-silver/silverraw/__init__.pyc
-silver/silverraw/silverbook.py
-silver/silverraw/silverbook.pyc
-silver/silverraw/silvercom.py
-silver/silverraw/silvercom.pyc
-silver/silverraw/silvercore.py
-silver/silverraw/silvercore.pyc
-silver/silverraw/silvershop.py
-silver/silverraw/silvershop.pyc
