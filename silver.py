@@ -32,6 +32,7 @@ class CONTACT_MEDIUM(Enum):
     EMAIL = "EMAIL"
 
 class PASSENGER_TYPE(Enum):
+    A = "A"
     C = "C"
 
 class ContactInfo:
@@ -69,7 +70,6 @@ class Passenger:
                 id=None,
                 first_name=None,
                 last_name=None,
-                passenger_type=None,
                 contact_info=[]):
         """Initializes passenger with attributes given
 
@@ -78,7 +78,6 @@ class Passenger:
            id (str):  The id of passenger - if not given, it's automatically generated.
            first_name (str):  First name of passenger.
            last_name (str):  Last name of passenger.
-           passenger_type (PASSENGER_TYPE):  The class type of passenger travelling.
            contact_info (ContactInfo[]):  The contact information of the passenger.
         """
 
@@ -90,7 +89,6 @@ class Passenger:
         self.age = age
         self.first_name = first_name
         self.last_name = last_name
-        self.passenger_type = passenger_type
         self.contact_info = contact_info
 
     def add_contact(self, contact_info):
@@ -152,7 +150,7 @@ class Leg:
     Represents a travel leg with its respective travel segments
     """
 
-    def __init__(self, id, tarvel_segments):
+    def __init__(self, id, travel_segments):
         """FUNC_DESC.
 
         Args:
@@ -162,7 +160,7 @@ class Leg:
         """
 
         self.id = id
-        self.tarvel_segments = tarvel_segments
+        self.travel_segments = travel_segments
 
 class TravelSegment:
     """
@@ -170,10 +168,13 @@ class TravelSegment:
     """
 
     def __init__(self, 
+                    type="TRAIN",
                     id = None,
                     sequence = None,
                     origin = None,
+                    origin_type = "STATION",
                     destination = None,
+                    destination_type = "STATION",
                     departure = None,
                     arrival = None,
                     designator = None,
@@ -184,10 +185,13 @@ class TravelSegment:
         """
 
         Args:
+            type (str): The type for the medium for transport
             id (str): The identifier of the travel segment.
             sequence (int): The ordering sequence number of the travel segment
             origin (str): The origin of the travel segment.
+            origin_type (str): The type of origin of the travel segment.
             destination (str): The destination of the travel segment.
+            destination_type (str): The destination type of the travel segment.
             departure (DateTime): The datetime of departure of the travel segment.
             arrival (DateTime): The datetime of arrival of the travel segment.
             designator (str): The designator for the travel segment.
@@ -199,9 +203,12 @@ class TravelSegment:
         """
 
         self.id = id
+        self.type = type
         self.sequence = sequence
         self.origin = origin
+        self.origin_type = origin_type
         self.destination = destination
+        self.destination_type = destination_type
         self.departure = departure
         self.arrival = arrival
         self.designator = designator
@@ -237,6 +244,46 @@ class FareCode:
         self.cabin_class = cabin_class
         self.fare_display_name = fare_display_name
 
+
+class FarePrice:
+    """
+    Class representing the breakdown costs of a fare total
+    """
+
+    def __init__(self, price, type, currency):
+        """
+
+        Args:
+            price (int): The price of the current fare breakdown item
+            type (str): The type of the fare price breakdown item
+            currency (str): The currency of the fare price breakdown item
+
+        """
+
+        self.price = price
+        self.type = type
+        self.currency = currency
+
+class PassengerReference:
+    """
+    An agregation of a passenger with respective fare codes for a ticketable fare
+    """
+
+    def __init__(self, passenger, class_type, fare_codes):
+        """
+        Args:
+            ARG (TYPE): DESC1
+            passenger (Passenger[]): The passenger for this reference.
+            class_type (PASSENGER_TYPE):  The class type of passenger travelling.
+            fare_codes (FareCode[]): An array of fare codes for this passenger.
+
+        """
+
+        self.passenger = passenger
+        self.class_type = class_type
+        self.fare_codes = fare_codes
+
+
 class TicketableFare:
     """ 
     Represents an individual section of a fare total, containing a set of fare codes and passengers
@@ -244,24 +291,24 @@ class TicketableFare:
 
     def __init__(self, 
                     price = None,
+                    prices = [],
                     currency = None,
-                    fare_codes = [],
-                    passengers = []):
+                    passenger_references = []):
         """
         Args:
             price (int): The total amount of the ticketable fare.
+            prices (FarePrice[]): Array of prices for the breakdown of the total
             currency (str): The currency of the fare.
-            fare_codes (FareCode[]): An array of fare codes for this ticketable fare.
-            passengers (Passenger[]): An array of passengers for this ticketable fare.
+            passenger_references (PassengeReference[]): An array of passenger references for this ticketable fare.
 
         """
 
         self.price = price
+        self.prices = prices
         self.currency = currency
-        self.fare_codes = fare_codes
-        self.passengers = passengers
+        self.passenger_references = passenger_references
 
-class FaresTotal:
+class FareTotal:
     """
     This class represents a fare for a specific leg, with specific segments given
     """
@@ -287,10 +334,10 @@ class FaresTotal:
 
         self.id = id
         self.currency = currency
-        self.total_amount = total_amount
-        self.leg_id = leg_id
+        self.price = price
         self.expiration = expiration
-        self.segments = segments
+        self.ticketable_fares = ticketable_fares
+        self.legs = legs
 
 
 class HTTPSClientAuthHandler(urllib2.HTTPSHandler):
@@ -374,15 +421,21 @@ class SilverSoap:
         self._point_of_sale = point_of_sale
         self._channel = channel
 
-        self.client = Client(SilverSoap.shopping_wsdl,
+        self.shop_client = Client(SilverSoap.shopping_wsdl,
                             transport=HTTPSClientCertTransport(key, cert),
                             location=SilverSoap.shopping_location,
                             retxml=True)
 
-    def _silver_send(self, api_func, xml_func, pyxb_xml):
+        self.book_client = Client(SilverSoap.booking_wsdl,
+                            transport=HTTPSClientCertTransport(key, cert),
+                            location=SilverSoap.booking_location,
+                            retxml=True)
+
+    def _silver_send(self, soap_client, api_func, xml_func, pyxb_xml):
         """Sends a raw xml message to the SilverCore backend with the function given with the func_enum provided.
 
         Args:
+            soap_client (SILVERCORE_API_CLIENT): The SOAP client to use for the request.
             api_func (SILVERCORE_API_FUNC): SilverCore functions available through the SOAP API.
             xml_func (SILVERCORE_XML_FUNC): The relevant silvercore xml element to create for the response
 
@@ -390,7 +443,6 @@ class SilverSoap:
             SilverRaw.Element. A SilverRaw element containing the response of the SilverCore SOAP request::
 
         """
-
         # Adding SOAP Envelope wrapper
         senv = silvercore.Envelope()
         senv.Header = pyxb.BIND()
@@ -408,7 +460,8 @@ class SilverSoap:
         xml = xml.replace(xml_func + ">", "ns3:" + xml_func + ">")
 
         # Call the relevant SilverCore function with the raw XML given 
-        result = getattr(self.client.service, api_func)(__inject={"msg": xml})
+        client_found = getattr(self, soap_client)
+        result = getattr(client_found.service, api_func)(__inject={"msg": xml})
 
         # Create respective SOAP SilverRaw object
         silver_obj = silvercore.CreateFromDocument(result)
@@ -452,7 +505,7 @@ class SilverSoap:
 
         p2p.pointToPointShoppingQuery = pyxb.BIND()
 
-        # Setting Fare filter to the compatible SilverCore string
+        # Setting Fare fixlter to the compatible SilverCore string
         p2p.pointToPointShoppingQuery.fareFilter = fare_query.fare_filter.value
         
         # Adding Travel Point Pairs
@@ -476,9 +529,152 @@ class SilverSoap:
 
         # Send point to point search request
         response = self._silver_send(
+            "shop_client",
             "PointToPointShop", 
             "pointToPointShoppingRequest", 
             p2p)
+
+        return response
+
+    def _create_booking(self, fares, passengers, parameters, response_specs):
+        """Creates the relevant silverraw objects and sends a create booking request to the silvercore api.
+
+        Args:
+            fares (FareTotal[]): An array of fares chosen to book.
+            passengers (Passenger[]): An array of passengers that will be present on each booking.
+            parameters (CREATE_BOOKING_PARAMS[]): Array of parameters to pass the create booking request (NOT SUPPORTED YET).
+            response_specs (CREATE_BOOKING_SPECS[]): Array of specs for the response from the SilverCore API.
+
+        Returns:
+            silverraw.createBookingResponse. Returns a createBookingResponse object::
+
+        """
+
+        cb = silverbook.createBookingRecordRequest()
+        
+        # Obtaining the context
+        cb.context = self._get_xml_context()
+
+        # TODO: Add support for parameters        
+        cb.parameters = pyxb.BIND()
+        cb.parameters.priceAcceptance = pyxb.BIND()
+        cb.parameters.priceAcceptance.acceptAny = True
+
+        # if len(response_specs):
+        #     cb.responseSpec = pyxb.BIND()
+        #     for r in response_specs:
+        #         getattr(cb.responseSpec, r) = True
+
+        # Adding passengers
+        cb.passengers = pyxb.BIND()
+        for idx1, passenger in enumerate(passengers):
+
+            cb.passengers.passenger.append(pyxb.BIND())
+
+            p = cb.passengers.passenger[idx1]
+
+            p.passengerID           = passenger.id
+            p.nameFirst             = passenger.first_name
+            p.nameLast              = passenger.last_name
+            p.ageAtTimeOfTravel     = 40
+
+            p.contactInformation = pyxb.BIND()
+
+            # Adding all contact information available for passenger
+            for contact in passenger.contact_info:
+                p.contactInformation.contact.append(pyxb.BIND(
+                        contactType=contact.type.value,
+                        contactMedium=contact.medium.value, 
+                        contactInfo=contact.info))
+
+        # Adding point to point prices
+        cb.prices = pyxb.BIND()
+        for idx2, fare in enumerate(fares):
+
+            cb.prices.pointToPointPrice.append(pyxb.BIND())
+
+            pr = cb.prices.pointToPointPrice[idx2]
+            pr.priceID = fare.id
+            pr.totalPrice = pyxb.BIND(fare.price, currency=fare.currency)
+            pr.holdExpiration = fare.expiration
+
+            pr.legReferences = pyxb.BIND()
+
+            for leg in fare.legs:
+                pr.legReferences.legSolutionIDRef.append(pyxb.BIND(leg.id))
+
+            # Add all ticketable fares
+            pr.ticketableFares = pyxb.BIND()
+            for idx5, ticketable in enumerate(fare.ticketable_fares):
+
+                pr.ticketableFares.ticketableFare.append(pyxb.BIND())
+
+                tf = pr.ticketableFares.ticketableFare[idx5]
+                tf.totalPrice = pyxb.BIND(ticketable.price, currency=ticketable.currency)
+
+                # Adding all price breakdown
+                tf.prices = pyxb.BIND()
+                for price in ticketable.prices:
+                    tf.prices.price.append(pyxb.BIND(price.price, type=price.type, currency=price.currency))
+
+                # Adding passenger references
+                tf.passengerReferences = pyxb.BIND()
+                for idx6, p_ref in enumerate(ticketable.passenger_references):
+
+                    tf.passengerReferences.passengerReference.append(pyxb.BIND())
+
+                    r = tf.passengerReferences.passengerReference[idx6]
+                    r.passengerIDRef = p_ref.passenger.id
+                    r.passengerTypeCode = p_ref.class_type.value
+
+                    # Adding fare codes
+                    r.fareCodes = pyxb.BIND()
+                    for id7, farecode in enumerate(p_ref.fare_codes):
+                        r.fareCodes.fareCode.append(pyxb.BIND())
+
+                        fc = r.fareCodes.fareCode[id7]
+                        fc.code = farecode.code
+                        fc.serviceClass = farecode.service_class
+                        fc.travelSegmentIDRef = farecode.travel_segment_id
+                        fc.cabinClass = farecode.cabin_class
+                        fc.fareDisplayName = farecode.fare_display_name
+
+            # Adding all legs for trip
+            cb.legSolutions = pyxb.BIND()
+            for idx3, leg in enumerate(fare.legs):
+
+                cb.legSolutions.legSolution.append(pyxb.BIND())
+
+                l = cb.legSolutions.legSolution[idx3]
+                l.legSolutionID = leg.id
+
+                # Adding all travel segments for each leg
+                l.travelSegments = pyxb.BIND()
+
+                for idx4, segment in enumerate(leg.travel_segments):
+
+                    l.travelSegments.travelSegment.append(pyxb.BIND())
+
+                    ts = l.travelSegments.travelSegment[idx4]
+
+                    ts.sequence                 = segment.sequence
+                    ts.travelSegmentID          = segment.id
+                    ts.type                     = segment.type
+                    ts.originTravelPoint        = pyxb.BIND(segment.origin, type=segment.origin_type)
+                    ts.destinationTravelPoint   = pyxb.BIND(segment.destination, type=segment.destination_type)
+                    ts.departureDateTime        = segment.departure
+                    ts.arrivalDateTime          = segment.arrival
+                    ts.designator               = segment.designator
+                    ts.marketingCarrier         = segment.marketing_carrier
+                    ts.operatingCarrier         = segment.operating_carrier
+                    ts.equipmentType            = pyxb.BIND(segment.equipment_type_str, code=segment.equipment_type)
+
+        # Send create booking request
+        response = self._silver_send(
+            "book_client",
+            "CreateBookingRecord", 
+            "createBookingRecordRequest", 
+            cb)
 
         return response
 
@@ -549,17 +745,21 @@ class SilverCore(SilverSoap):
         return self._search_fare(fare_query)
 
 
-    def create_booking(self, fares, passengers):
+    def create_booking(self, fares, passengers, parameters=[], response_specs = []):
         """Creates a booking with the fares and passengers given, and returns a response object
 
         Args:
             fares (FareTotal[]): An array of fares chosen to book.
             passengers (Passenger[]): An array of passengers that will be present on each booking.
+            parameters (CREATE_BOOKING_PARAMS[]): Array of parameters to pass the create booking request  (NOT SUPPORTED YET).
+            response_specs (CREATE_BOOKING_SPECS[]): Array of specs for the response from the SilverCore API.
 
         Returns:
-            TYPE. DESC::
+            silverraw.createBookingResponse. Returns a createBookingResponse object::
 
         """
+
+        return self._create_booking(fares, passengers, parameters, response_specs)
 
 
 
