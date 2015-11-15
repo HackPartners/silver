@@ -3,3 +3,8 @@ setup.cfg
 setup.py
 silver/__init__.py
 silver/silver.py
+silver/silverraw/__init__.py
+silver/silverraw/silverbook.py
+silver/silverraw/silvercom.py
+silver/silverraw/silvercore.py
+silver/silverraw/silvershop.py
