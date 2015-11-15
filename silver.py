@@ -12,6 +12,8 @@ from suds.client import Client
 from suds.sax.text import Raw
 from suds.transport.http import HttpTransport, Reply, TransportError
 
+class TRAVEL_TYPE:
+    STATION = "STATION"
 
 class FARE_FILTER(Enum):
     NONE = "NONE"
@@ -62,7 +64,7 @@ class TravelPoint:
     Stores a pair of origin and destination location as well as the time of departure and arrival
     """
 
-    def __init__(self, origin=None, destination=None, departure=None, arrival=None):
+    def __init__(self, origin=None, destination=None, departure=None, arrival=None, type=TRAVEL_TYPE.STATION):
         """Initializes the Travelpoint with the relevant origin and destination, and optional departure and arrival times.
 
         Args:
@@ -71,10 +73,15 @@ class TravelPoint:
            departure (DateTime):  Approximate time and date of departure.
            arrival (DateTime):  Approximate time and date of arrival.
         """
+
+        if not departure and not arrival:
+            raise Exception("You must supply either departure time, arrival time.")
+
         self.origin = origin
         self.destination = destination
         self.departure = departure
         self.arrival = arrival
+        self.type = type
 
 
 class FareSearch:
@@ -203,6 +210,7 @@ class SilverSoap:
         # If anyone can submit a pull request to pyxb to fix it, or 
         # find a neater walkaround, let's do it.
         xml = xml.replace(xml_func + ">", "ns3:" + xml_func + ">")
+        print xml
 
         # Call the relevant SilverCore function with the raw XML given 
         result = getattr(self.client.service, api_func)(__inject={"msg": xml})
@@ -247,16 +255,29 @@ class SilverSoap:
         # Obtaining the context
         p2p.context = self._get_xml_context()
 
-        # Assigning the relevant values
         p2p.pointToPointShoppingQuery = pyxb.BIND()
-        p2p.pointToPointShoppingQuery.fareFilter = "CHEAPEST_ONEWAY_AND_ROUNDTRIP"
+
+        # Setting Fare filter to the compatible SilverCore string
+        p2p.pointToPointShoppingQuery.fareFilter = fare_query.fare_filter.value
+        
+        # Adding Travel Point Pairs
         p2p.pointToPointShoppingQuery.travelPointPairs = pyxb.BIND()
-        p2p.pointToPointShoppingQuery.travelPointPairs.append(pyxb.BIND())
-        p2p.pointToPointShoppingQuery.travelPointPairs.travelPointPair[0].originTravelPoint = pyxb.BIND("GBRDG", type="STATION")
-        p2p.pointToPointShoppingQuery.travelPointPairs.travelPointPair[0].destinationTravelPoint = pyxb.BIND("GBQQM", type="STATION")
-        p2p.pointToPointShoppingQuery.travelPointPairs.travelPointPair[0].departureDateTimeWindow = pyxb.BIND(date="2015-12-07", time="06:00:00")
-        p2p.pointToPointShoppingQuery.passengerSpecs = pyxb.BIND()
-        p2p.pointToPointShoppingQuery.passengerSpecs.append(pyxb.BIND(passengerSpecID="PAX_A1", age=40))
+
+        i = 0
+        for tp in fare_query.travel_points:
+            p2p.pointToPointShoppingQuery.travelPointPairs.append(pyxb.BIND())
+            p2p.pointToPointShoppingQuery.travelPointPairs.travelPointPair[i].originTravelPoint = pyxb.BIND(tp.origin, type=tp.type)
+            p2p.pointToPointShoppingQuery.travelPointPairs.travelPointPair[i].destinationTravelPoint = pyxb.BIND(tp.destination, type=tp.type)
+
+            if tp.departure:
+                p2p.pointToPointShoppingQuery.travelPointPairs.travelPointPair[i].departureDateTimeWindow = \
+                    pyxb.BIND(date=datetime.strftime(tp.departure, "%Y-%m-%d"), time=datetime.strftime(tp.departure, "%H:%M:%S"))
+
+            i = i + 1
+
+        for p in fare_query.passengers:
+            p2p.pointToPointShoppingQuery.passengerSpecs = pyxb.BIND()
+            p2p.pointToPointShoppingQuery.passengerSpecs.append(pyxb.BIND(passengerSpecID=p.id, age=p.age))
 
         # Send point to point search request
         response = self._silver_send(
