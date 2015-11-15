@@ -1,12 +1,7 @@
 from silvercore import *
 
 # Initialize with disrtibutor, point of sale, and channel
-sc = SilverCore("HackTrain", "GB", "CH2")
-
-# Initialize certificate
-cert = os.ENV["SILVERCORE_CERT"]
-pwd = os.ENV["SILVERCORE_PASSWORD"]
-sc.verify(cert, pwd) 
+sc = silver.SilverCore("HackTrain", "GB", "CH2", "/Users/bloomberglondonrd1/.ssh/certificates/hacktrain.nokey.pem", "/Users/bloomberglondonrd1/.ssh/certificates/hacktrain.key")
 
 # =======================================================
 # ===================== Fares query =====================
@@ -176,11 +171,11 @@ f1 = FareTotal(
         specs = [FARE_SPECS.RETURN_DETAILS])
 
 p1 = Passenger(
-    id="PAX_SPEC_0",
+    passenger_id="PAX_SPEC_0",
     age=30)
 
 p2 = Passenger(
-    id="PAX_SPEC_1",
+    passenger_id="PAX_SPEC_1",
     age=15)
 
 p1.add_contact(CONTACT_TYPE.HOME, CONTACT_MEDIUM.PHONE, "123456789")
