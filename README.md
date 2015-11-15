@@ -18,8 +18,9 @@ In order to initialize the SilverClient, you will require:
 * SILVERCORE_CERT (Path to your SilverCore Certificate)
 * SILVERCORE_KEY (Path to your SilverCore Key)
 
-*Then just run the following commend*
+*Then just run the following command*
 ``` python
+    from silver import *
     cert = os.environ("SILVERCORE_CERT")
     key = os.environ("SILVERCORE_KEY")
     sc = SilverCore("HackTrain", "GB", "CH2", cert, key)
