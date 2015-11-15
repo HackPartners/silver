@@ -302,22 +302,21 @@ b = BillingAddress(
         city="London",
         zip_code="WC2B 5QN"
         country="GB",
-        type="BUSINESS"
+        type=ADDRESS_TYPE.BUSINESS
     )
 
 p = PaymentMethod(
-    record_locator="B-DEMO-WLC000133",
+    record_locator="B-HACKTRAIN-MJQ000264",
     payment_form="CA",
-    payment_form_type="CC",
+    payment_form_type=PAYMENT_TYPE.CREDIT_CARD,
     card_number="5425232820001308",
     card_type="CA",
     card_holder_first_name="Jonathan",
     card_holder_last_name="Harrah",
-    amount=31.20,
+    amount=198.50,
     currency="GBP",
     customer_ip_address="1.1.1.1",
-    billing_address=b,
-    response_spec=["returnReservationDetails"])
+    billing_address=b)
 
 payment_response = sc.add_payment(p)
 
@@ -342,5 +341,9 @@ print payment_response.success # True
 
 
 
+reload(silver)
+from silver import *
+sc = SilverCore("HackTrain", "GB", "CH2", "/Users/bloomberglondonrd1/.ssh/certificates/hacktrain.nokey.pem", "/Users/bloomberglondonrd1/.ssh/certificates/hacktrain.key")
+payment_response = sc.add_payment(p)
 
 

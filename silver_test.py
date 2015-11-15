@@ -1,5 +1,5 @@
 from silverraw import silvershop, silvercom, silverbook, silvercore
-from silver import SilverCore, Passenger, TravelPoint, FareSearch, FARE_FILTER, CONTACT_TYPE, FareTotal, TravelSegment
+from silver import *
 import pyxb
 from datetime import datetime
 
@@ -231,4 +231,43 @@ print booking_result.requestStatus.success # True
 
 print booking_result.recordLocator # B-HACKTRAIN-IKS000262
 print booking_result.lastHoldDateTime # 2015-11-15T15:49:09Z
+
+record_locator = booking_result.recordLocator
+
+
+# =======================================================
+# ==================== Add Payment ======================
+# =======================================================
+
+
+b = BillingAddress(
+        address1="9 Broad Court, Long Acre",
+        city="London",
+        zip_code="WC2B 5QN",
+        country="GB",
+        type=ADDRESS_TYPE.BUSINESS)
+
+p = PaymentMethod(
+    record_locator=record_locator,
+    payment_form="CA",
+    payment_form_type=PAYMENT_TYPE.CREDIT_CARD,
+    card_number="5425232820001308",
+    card_type="CA",
+    card_holder_first_name="Jonathan",
+    card_holder_last_name="Harrah",
+    expiration_year=2016,
+    expiration_month=12,
+    card_validation_number="123",
+    amount=198.20,
+    currency="GBP",
+    customer_ip_address="1.1.1.1",
+    billing_address=b)
+
+payment_response = sc.add_payment(p)
+
+print payment_response.requestStatus.success # True
+print payment_response.paymentToken # Nl6qpzWfQiylKDaExw2W/g==
+
+payment_token = payment_response.paymentToken
+
 

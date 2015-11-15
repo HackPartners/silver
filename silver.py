@@ -12,6 +12,11 @@ from suds.client import Client
 from suds.sax.text import Raw
 from suds.transport.http import HttpTransport, Reply, TransportError
 
+
+# Making binding easier to use
+b=pyxb.BIND
+
+
 class TRAVEL_TYPE:
     STATION = "STATION"
 
@@ -34,6 +39,78 @@ class CONTACT_MEDIUM(Enum):
 class PASSENGER_TYPE(Enum):
     A = "A"
     C = "C"
+
+class ADDRESS_TYPE(Enum):
+    BUSINESS = "BUSINESS"
+
+class PAYMENT_TYPE(Enum):
+    CREDIT_CARD = "CC"
+    ON_ACCOUNT = "OA"
+    DEBIT_CARD = "DB"
+
+class BillingAddress:
+    """
+    This class represents a billing address. It is mostly used for payemnts.
+    """
+
+    def __init__(self, 
+                    address1 = None,
+                    city = None,
+                    zip_code = None,
+                    country = None,
+                    type = None):
+        """
+        Args:
+            address1 (str): Your first line of billing address.
+            city (str): Your billing city.
+            zip_code (str): Your billing zip code.
+            country (str): The country of your billing address.
+            type (ADDRESS_TYPE): The type of payemnt.
+        """
+
+        self.address1 = address1
+        self.city = city
+        self.zip_code = zip_code
+        self.country = country
+        self.type = type
+
+class PaymentMethod:
+    """
+    This class represents a payment method for use in SilverCore API.
+    """
+
+    def __init__(self, 
+                    record_locator = None,
+                    payment_form = None,
+                    payment_form_type = None,
+                    card_number = None,
+                    card_type = None,
+                    card_holder_first_name = None,
+                    card_holder_last_name = None,
+                    card_validation_number = None,
+                    amount = None,
+                    currency = None,
+                    expiration_year = None,
+                    expiration_month = None,
+                    customer_ip_address = None,
+                    billing_address = None,
+                    response_spec = None):
+
+        self.record_locator = record_locator
+        self.payment_form = payment_form
+        self.payment_form_type = payment_form_type
+        self.card_number = card_number
+        self.card_type = card_type
+        self.card_holder_first_name = card_holder_first_name
+        self.card_holder_last_name = card_holder_last_name
+        self.card_validation_number = card_validation_number
+        self.amount = amount
+        self.currency = currency
+        self.expiration_year = expiration_year
+        self.expiration_month = expiration_month
+        self.customer_ip_address = customer_ip_address
+        self.billing_address = billing_address
+        self.response_spec = response_spec
 
 class ContactInfo:
     """
@@ -445,8 +522,8 @@ class SilverSoap:
         """
         # Adding SOAP Envelope wrapper
         senv = silvercore.Envelope()
-        senv.Header = pyxb.BIND()
-        senv.Body = pyxb.BIND()
+        senv.Header = b()
+        senv.Body = b()
         getattr(senv.Body, xml_func).append(pyxb_xml)
 
         xml = str(senv.toxml())
@@ -477,11 +554,11 @@ class SilverSoap:
         """Returns a pyxb BIND representation of a silverraw context object. In order for the context to be valid, it has to be assigned to an object's context property.
 
         Returns:
-            pyxb.BIND. A pyxb.BIND object representing a silverraw context object::
+            b. A b object representing a silverraw context object::
 
         """
 
-        return pyxb.BIND(
+        return b(
             distributorCode="HACKTRAIN", 
             pointOfSaleCode="GB", 
             channelCode="CH1")
@@ -503,29 +580,29 @@ class SilverSoap:
         # Obtaining the context
         p2p.context = self._get_xml_context()
 
-        p2p.pointToPointShoppingQuery = pyxb.BIND()
+        p2p.pointToPointShoppingQuery = b()
 
         # Setting Fare fixlter to the compatible SilverCore string
         p2p.pointToPointShoppingQuery.fareFilter = fare_query.fare_filter.value
         
         # Adding Travel Point Pairs
-        p2p.pointToPointShoppingQuery.travelPointPairs = pyxb.BIND()
+        p2p.pointToPointShoppingQuery.travelPointPairs = b()
 
         i = 0
         for tp in fare_query.travel_points:
-            p2p.pointToPointShoppingQuery.travelPointPairs.append(pyxb.BIND())
-            p2p.pointToPointShoppingQuery.travelPointPairs.travelPointPair[i].originTravelPoint = pyxb.BIND(tp.origin, type=tp.type)
-            p2p.pointToPointShoppingQuery.travelPointPairs.travelPointPair[i].destinationTravelPoint = pyxb.BIND(tp.destination, type=tp.type)
+            p2p.pointToPointShoppingQuery.travelPointPairs.append(b())
+            p2p.pointToPointShoppingQuery.travelPointPairs.travelPointPair[i].originTravelPoint = b(tp.origin, type=tp.type)
+            p2p.pointToPointShoppingQuery.travelPointPairs.travelPointPair[i].destinationTravelPoint = b(tp.destination, type=tp.type)
 
             if tp.departure:
                 p2p.pointToPointShoppingQuery.travelPointPairs.travelPointPair[i].departureDateTimeWindow = \
-                    pyxb.BIND(date=datetime.strftime(tp.departure, "%Y-%m-%d"), time=datetime.strftime(tp.departure, "%H:%M:%S"))
+                    b(date=datetime.strftime(tp.departure, "%Y-%m-%d"), time=datetime.strftime(tp.departure, "%H:%M:%S"))
 
             i = i + 1
 
         for p in fare_query.passengers:
-            p2p.pointToPointShoppingQuery.passengerSpecs = pyxb.BIND()
-            p2p.pointToPointShoppingQuery.passengerSpecs.append(pyxb.BIND(passengerSpecID=p.id, age=p.age))
+            p2p.pointToPointShoppingQuery.passengerSpecs = b()
+            p2p.pointToPointShoppingQuery.passengerSpecs.append(b(passengerSpecID=p.id, age=p.age))
 
         # Send point to point search request
         response = self._silver_send(
@@ -556,20 +633,20 @@ class SilverSoap:
         cb.context = self._get_xml_context()
 
         # TODO: Add support for parameters        
-        cb.parameters = pyxb.BIND()
-        cb.parameters.priceAcceptance = pyxb.BIND()
+        cb.parameters = b()
+        cb.parameters.priceAcceptance = b()
         cb.parameters.priceAcceptance.acceptAny = True
 
         # if len(response_specs):
-        #     cb.responseSpec = pyxb.BIND()
+        #     cb.responseSpec = b()
         #     for r in response_specs:
         #         getattr(cb.responseSpec, r) = True
 
         # Adding passengers
-        cb.passengers = pyxb.BIND()
+        cb.passengers = b()
         for idx1, passenger in enumerate(passengers):
 
-            cb.passengers.passenger.append(pyxb.BIND())
+            cb.passengers.passenger.append(b())
 
             p = cb.passengers.passenger[idx1]
 
@@ -578,59 +655,59 @@ class SilverSoap:
             p.nameLast              = passenger.last_name
             p.ageAtTimeOfTravel     = 40
 
-            p.contactInformation = pyxb.BIND()
+            p.contactInformation = b()
 
             # Adding all contact information available for passenger
             for contact in passenger.contact_info:
-                p.contactInformation.contact.append(pyxb.BIND(
+                p.contactInformation.contact.append(b(
                         contactType=contact.type.value,
                         contactMedium=contact.medium.value, 
                         contactInfo=contact.info))
 
         # Adding point to point prices
-        cb.prices = pyxb.BIND()
+        cb.prices = b()
         for idx2, fare in enumerate(fares):
 
-            cb.prices.pointToPointPrice.append(pyxb.BIND())
+            cb.prices.pointToPointPrice.append(b())
 
             pr = cb.prices.pointToPointPrice[idx2]
             pr.priceID = fare.id
-            pr.totalPrice = pyxb.BIND(fare.price, currency=fare.currency)
+            pr.totalPrice = b(fare.price, currency=fare.currency)
             pr.holdExpiration = fare.expiration
 
-            pr.legReferences = pyxb.BIND()
+            pr.legReferences = b()
 
             for leg in fare.legs:
-                pr.legReferences.legSolutionIDRef.append(pyxb.BIND(leg.id))
+                pr.legReferences.legSolutionIDRef.append(b(leg.id))
 
             # Add all ticketable fares
-            pr.ticketableFares = pyxb.BIND()
+            pr.ticketableFares = b()
             for idx5, ticketable in enumerate(fare.ticketable_fares):
 
-                pr.ticketableFares.ticketableFare.append(pyxb.BIND())
+                pr.ticketableFares.ticketableFare.append(b())
 
                 tf = pr.ticketableFares.ticketableFare[idx5]
-                tf.totalPrice = pyxb.BIND(ticketable.price, currency=ticketable.currency)
+                tf.totalPrice = b(ticketable.price, currency=ticketable.currency)
 
                 # Adding all price breakdown
-                tf.prices = pyxb.BIND()
+                tf.prices = b()
                 for price in ticketable.prices:
-                    tf.prices.price.append(pyxb.BIND(price.price, type=price.type, currency=price.currency))
+                    tf.prices.price.append(b(price.price, type=price.type, currency=price.currency))
 
                 # Adding passenger references
-                tf.passengerReferences = pyxb.BIND()
+                tf.passengerReferences = b()
                 for idx6, p_ref in enumerate(ticketable.passenger_references):
 
-                    tf.passengerReferences.passengerReference.append(pyxb.BIND())
+                    tf.passengerReferences.passengerReference.append(b())
 
                     r = tf.passengerReferences.passengerReference[idx6]
                     r.passengerIDRef = p_ref.passenger.id
                     r.passengerTypeCode = p_ref.class_type.value
 
                     # Adding fare codes
-                    r.fareCodes = pyxb.BIND()
+                    r.fareCodes = b()
                     for id7, farecode in enumerate(p_ref.fare_codes):
-                        r.fareCodes.fareCode.append(pyxb.BIND())
+                        r.fareCodes.fareCode.append(b())
 
                         fc = r.fareCodes.fareCode[id7]
                         fc.code = farecode.code
@@ -640,34 +717,34 @@ class SilverSoap:
                         fc.fareDisplayName = farecode.fare_display_name
 
             # Adding all legs for trip
-            cb.legSolutions = pyxb.BIND()
+            cb.legSolutions = b()
             for idx3, leg in enumerate(fare.legs):
 
-                cb.legSolutions.legSolution.append(pyxb.BIND())
+                cb.legSolutions.legSolution.append(b())
 
                 l = cb.legSolutions.legSolution[idx3]
                 l.legSolutionID = leg.id
 
                 # Adding all travel segments for each leg
-                l.travelSegments = pyxb.BIND()
+                l.travelSegments = b()
 
                 for idx4, segment in enumerate(leg.travel_segments):
 
-                    l.travelSegments.travelSegment.append(pyxb.BIND())
+                    l.travelSegments.travelSegment.append(b())
 
                     ts = l.travelSegments.travelSegment[idx4]
 
                     ts.sequence                 = segment.sequence
                     ts.travelSegmentID          = segment.id
                     ts.type                     = segment.type
-                    ts.originTravelPoint        = pyxb.BIND(segment.origin, type=segment.origin_type)
-                    ts.destinationTravelPoint   = pyxb.BIND(segment.destination, type=segment.destination_type)
+                    ts.originTravelPoint        = b(segment.origin, type=segment.origin_type)
+                    ts.destinationTravelPoint   = b(segment.destination, type=segment.destination_type)
                     ts.departureDateTime        = segment.departure
                     ts.arrivalDateTime          = segment.arrival
                     ts.designator               = segment.designator
                     ts.marketingCarrier         = segment.marketing_carrier
                     ts.operatingCarrier         = segment.operating_carrier
-                    ts.equipmentType            = pyxb.BIND(segment.equipment_type_str, code=segment.equipment_type)
+                    ts.equipmentType            = b(segment.equipment_type_str, code=segment.equipment_type)
 
         # Send create booking request
         response = self._silver_send(
@@ -675,6 +752,77 @@ class SilverSoap:
             "CreateBookingRecord", 
             "createBookingRecordRequest", 
             cb)
+
+        return response
+
+    def _add_payment(self, payment, response_specs):
+        """Creates the SilverRaw SOAP objects to communicate to the AddPayment API and add the payment given by the silver.PaymentMethod object
+
+        Args:
+            payment (PaymentMethod): The payment method to use.
+            response_specs (CREATE_BOOKING_SPECS[]): Array of specs for the response from the SilverCore API (NOT SUPPORTED YET).
+
+        Returns:
+            silverraw.addPaymentResponse. Returns a addPaymentResponse object::
+
+        """
+
+        ap = silverbook.addPaymentRequest()
+        
+        # Get context
+        ap.context = self._get_xml_context()
+
+        # Record locator to identify booking
+        ap.recordLocator = payment.record_locator
+
+        # Adding method of payment
+        ap.payment = b()
+        ap.payment.formOfPayment                    = b(payment.payment_form, type=payment.payment_form_type.value)
+        ap.payment.creditCard                       = b(type = payment.card_type)
+        ap.payment.creditCard.number                = payment.card_number
+        
+        expiration_ym = str(payment.expiration_year) + "-" + str(payment.expiration_month)
+        ap.payment.creditCard.expirationYearMonth   = b(expiration_ym)
+        
+        fl_name = payment.card_holder_first_name + " " + payment.card_holder_last_name
+        ap.payment.creditCard.cardholderName        = fl_name
+        
+        billing_address = payment.billing_address
+        ba = b(address1=billing_address.address1, 
+                city=billing_address.city, 
+                zipCode=billing_address.zip_code, 
+                country=billing_address.country, 
+                addressType=billing_address.type.value)
+
+        ap.payment.creditCard.billingAddress        = ba
+        ap.payment.creditCard.validationNumber      = payment.card_validation_number
+        ap.payment.amount                           = b(payment.amount, currency=payment.currency)
+
+        print ap.payment.creditCard.billingAddress.toxml()
+        print ap.payment.creditCard.toxml()
+
+        response = self._silver_send(
+            "book_client",
+            "AddPaymentRequest", 
+            "addPaymentRequest", 
+            ap)
+
+        return response
+
+
+    def confirm_booking(self, confirmation, response_specs=[]):
+        """Confirms the booking assuming that payments have been added and everything has been finalised
+
+        Args:
+            confirmation (BookingConfirmation): The confirmation details to finalise and confirm booking.
+            response_specs (CREATE_BOOKING_SPECS[]): Array of specs for the response from the SilverCore API (NOT SUPPORTED YET).
+
+        Returns:
+            silverraw.confirmBookingResponse. Returns a confirmBookingResponse object::
+
+        """
+
+        response = None
 
         return response
 
@@ -752,7 +900,7 @@ class SilverCore(SilverSoap):
             fares (FareTotal[]): An array of fares chosen to book.
             passengers (Passenger[]): An array of passengers that will be present on each booking.
             parameters (CREATE_BOOKING_PARAMS[]): Array of parameters to pass the create booking request  (NOT SUPPORTED YET).
-            response_specs (CREATE_BOOKING_SPECS[]): Array of specs for the response from the SilverCore API.
+            response_specs (CREATE_BOOKING_SPECS[]): Array of specs for the response from the SilverCore API (NOT SUPPORTED YET).
 
         Returns:
             silverraw.createBookingResponse. Returns a createBookingResponse object::
@@ -761,11 +909,34 @@ class SilverCore(SilverSoap):
 
         return self._create_booking(fares, passengers, parameters, response_specs)
 
+    def add_payment(self, payment, response_specs=[]):
+        """Adds a form of payment to an existing booking referenced throuhg a record locator object
+
+        Args:
+            payment (PaymentMethod): The payment method to use.
+            response_specs (CREATE_BOOKING_SPECS[]): Array of specs for the response from the SilverCore API (NOT SUPPORTED YET).
+
+        Returns:
+            silverraw.addPaymentResponse. Returns a addPaymentResponse object::
+
+        """
+
+        return self._add_payment(payment, response_specs)
 
 
+    def confirm_booking(self, confirmation, response_specs=[]):
+        """Confirms the booking assuming that payments have been added and everything has been finalised
 
+        Args:
+            confirmation (BookingConfirmation): The confirmation details to finalise and confirm booking.
+            response_specs (CREATE_BOOKING_SPECS[]): Array of specs for the response from the SilverCore API (NOT SUPPORTED YET).
 
+        Returns:
+            silverraw.confirmBookingResponse. Returns a confirmBookingResponse object::
 
+        """
+
+        return self._confirm_booking(confirmation, response_specs)
 
 
 
