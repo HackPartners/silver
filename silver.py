@@ -884,9 +884,6 @@ class SilverSoap:
         ap.payment.creditCard.validationNumber      = payment.card_validation_number
         ap.payment.amount                           = b(payment.amount, currency=payment.currency)
 
-        print ap.payment.creditCard.billingAddress.toxml()
-        print ap.payment.creditCard.toxml()
-
         response = self._silver_send(
             "book_client",
             "AddPaymentRequest", 
