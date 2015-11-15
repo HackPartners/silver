@@ -48,6 +48,92 @@ class PAYMENT_TYPE(Enum):
     ON_ACCOUNT = "OA"
     DEBIT_CARD = "DB"
 
+class CONFIRMATION_TYPE(Enum):
+    CREDIT_CARD = "CC"
+    DEBIT_CARD = "DB"
+    ID_CARD = "ID"
+    LOYALTY_CARD = "LC"
+
+class TICKET_DELIVERY_OPTION(Enum):
+    EMAIL = "EML"
+    E_TICKET = "ETK"
+    PRINT_AT_HOME = "PAH"
+    SMS = "SMS"
+    CONDUCTOR = "TBC"
+    REGULAR_MAIL = "TBM"
+    OVERNIGHT_MAIL = "TBO"
+    EXPRESS_MAIL = "TBX"
+    METRO_LINK = "TML"
+    TICKETING_OFFICE = "TOF"
+    VENDING_MACHINE = "TVM"
+
+class TicketOption:
+    """
+    Represents a ticket option to add, modify or remove an existing booking
+    """
+
+    def __init__(self, code, currency, fee):
+        """
+        Args:
+            code (TICKET_DELIVERY_OPTION): Type of ticket option.
+            currency (str): Currency of fees involved.
+            fee (int): Amount infolved as fee in order to have this ticket option.
+
+        """
+        self.code = code
+        self.currency = currency
+        self.fee = fee
+
+class BookingUpdate:
+    """
+    This class represents a booking update, and allows users to add/remove fees, ticket delivery option/fee, adding passenger IDs, leg solutions, etc.
+    """
+
+    def __init__(self, 
+                    record_locator = None,
+                    ticket_option = None):
+        """
+        Args:
+            record_locator (str): The identifier of the booking record.
+            ticket_option (TicketOption): A TicketOption object specifying the option to add to a specific booking
+        """
+
+        self.record_locator = record_locator
+        self.ticket_option = ticket_option
+
+class BookingConfirmation:
+    """ 
+    This class represents a booking confirmation.
+    """
+
+    def __init__(self, 
+                    record_locator = None,
+                    confirmation_type = None,
+                    card_number = None,
+                    expiration_year=2016,
+                    expiration_month=12,
+                    card_holder_first_name = None,
+                    card_holder_last_name = None):
+        """
+        Args:
+            record_locator (str): The identifier of the booking record.
+            confirmation_type (CONFIRMATION_TYPE): The form of confirmation for the booking.
+            card_number (str): The card number.
+            expiration_year (int): The year of expiration of card.
+            expiration_month (int): The month of expiration of card.
+            card_holder_first_name (str): The first name of card holder.
+            card_holder_last_name (str): The last name of card holder.
+
+        """
+
+        self.record_locator = record_locator
+        self.confirmation_type = confirmation_type
+        self.card_number = card_number
+        self.expiration_year = expiration_year
+        self.expiration_month = expiration_month
+        self.card_holder_first_name = card_holder_first_name
+        self.card_holder_last_name = card_holder_last_name
+
 class BillingAddress:
     """
     This class represents a billing address. It is mostly used for payemnts.
@@ -809,9 +895,45 @@ class SilverSoap:
 
         return response
 
+    def _update_booking(self, booking_update, response_specs):
+        """
+        Creates an silverraw update booking object based on the update options given and calls the silvercore api with the objects created.
 
-    def confirm_booking(self, confirmation, response_specs=[]):
-        """Confirms the booking assuming that payments have been added and everything has been finalised
+        Args:
+            booking_update (BookingUpdate): A booking update with the relevant booking update options.
+            response_specs (CREATE_BOOKING_SPECS[]): Array of specs for the response from the SilverCore API (NOT SUPPORTED YET).
+
+        Returns:
+            silverraw.updateBookingRecordRequest. Returns an updateBookingRecordRequest object::
+
+        """
+
+        bu = silverbook.updateBookingRecordRequest()
+
+        # Adding context
+        bu.context = self._get_xml_context()
+
+        # Adding booking record id
+        bu.recordLocator = booking_update.record_locator
+
+        # Adding ticket option information
+        to = booking_update.ticket_option
+        if to:
+            bu.fulfillmentInformation = b()
+            bu.fulfillmentInformation.ticketOption = b()
+            bu.fulfillmentInformation.ticketOption.code = to.code.value
+            bu.fulfillmentInformation.ticketOption.code.fee = b(to.fee, currency=to.currency)
+
+        response = self._silver_send(
+            "book_client",
+            "UpdateBookingRecordRequest", 
+            "updateBookingRecordRequest", 
+            bu)
+
+        return response
+
+    def _confirm_booking(self, confirmation, response_specs=[]):
+        """Creates the SilverRaw objects necessary to send a booking confirmation request to the server
 
         Args:
             confirmation (BookingConfirmation): The confirmation details to finalise and confirm booking.
@@ -822,7 +944,32 @@ class SilverSoap:
 
         """
 
-        response = None
+        cb = silverbook.confirmBookingRecordRequest()
+
+        # Retreiving context
+        cb.context = self._get_xml_context()
+
+        # Record locator
+        cb.recordLocator = confirmation.record_locator
+        cb.confirmationInformation = b()
+
+        cb.confirmationInformation
+        cb.confirmationInformation.selectedConfirmationOption = b()
+
+        expiration_ym = str(confirmation.expiration_year) + "-" + str(confirmation.expiration_month)
+
+        conf_opt = b(cardholderNameLast=confirmation.card_holder_last_name, 
+                cardholderNameFirst=confirmation.card_holder_first_name, 
+                cardNumber=confirmation.card_number, 
+                expirationYearMonth=expiration_ym)
+
+        cb.confirmationInformation.selectedConfirmationOption.creditCardOption = conf_opt
+
+        response = self._silver_send(
+            "book_client",
+            "ConfirmBookingRecordRequest", 
+            "confirmBookingRecordRequest", 
+            cb)
 
         return response
 
@@ -923,6 +1070,17 @@ class SilverCore(SilverSoap):
 
         return self._add_payment(payment, response_specs)
 
+    def update_booking(self, booking_update, response_specs=[]):
+        """
+        Args:
+            booking_update (BookingUpdate): A booking update with the relevant booking update options.
+            response_specs (CREATE_BOOKING_SPECS[]): Array of specs for the response from the SilverCore API (NOT SUPPORTED YET).
+
+        Returns:
+            silverraw.updateBookingRecordRequest. Returns an updateBookingRecordRequest object::
+
+        """
+        return self._update_booking(booking_update, response_specs)
 
     def confirm_booking(self, confirmation, response_specs=[]):
         """Confirms the booking assuming that payments have been added and everything has been finalised

@@ -253,8 +253,8 @@ p = PaymentMethod(
     payment_form_type=PAYMENT_TYPE.CREDIT_CARD,
     card_number="5425232820001308",
     card_type="CA",
-    card_holder_first_name="Jonathan",
-    card_holder_last_name="Harrah",
+    card_holder_first_name="Jane",
+    card_holder_last_name="Smith",
     expiration_year=2016,
     expiration_month=12,
     card_validation_number="123",
@@ -269,5 +269,52 @@ print payment_response.requestStatus.success # True
 print payment_response.paymentToken # Nl6qpzWfQiylKDaExw2W/g==
 
 payment_token = payment_response.paymentToken
+
+
+
+
+
+# =======================================================
+# ==================== Add Delivery =====================
+# =======================================================
+
+to1 = TicketOption(
+    TICKET_DELIVERY_OPTION.VENDING_MACHINE,
+    "GBP",
+    0.00)
+
+bu = BookingUpdate(
+                record_locator=record_locator,
+                ticket_option=to1)
+
+booking_update = sc.update_booking(bu)
+
+booking_update.toxml()
+
+# =======================================================
+# =================== Confirm Booking ===================
+# =======================================================
+
+
+b = BookingConfirmation(
+    record_locator=record_locator,
+    confirmation_type=CONFIRMATION_TYPE.CREDIT_CARD,
+    card_number="5425232820001308",
+    expiration_year=2016,
+    expiration_month=12,
+    card_holder_first_name="Jonathan",
+    card_holder_last_name="Harrah")
+
+booking_confirm = sc.confirm_booking(b)
+
+print booking_confirm.toxml()
+
+
+
+
+
+
+
+
 
 
