@@ -1,8 +1,10 @@
 # Silver.py: Rail payments made easy
-#### The friendly open source SilverCore python interface
-
-## What is silver.py?
+##### The friendly open source SilverCore python interface
+--
+#### What is silver.py?
 A python wrapper for SilverRail's globally renowned SilverCore API. This python wrapper aims to provide a thin layer that abstracts the SOAP and SSL leg-work, and exposes a simple, pythonic interface. It's very simple to get started!
+
+#### More info at silverrailtech.com!
 
 ### Installing
 ``` bash
@@ -10,7 +12,7 @@ A python wrapper for SilverRail's globally renowned SilverCore API. This python 
 ```
 
 ### Initialize the SilverClient
-In order to initialize the SilverClient, you will require:
+In order to initialize the SilverClient, you will require the following variables:
 
 * distributor (HackTrain)
 * pointOfSale (GB)
@@ -21,17 +23,20 @@ In order to initialize the SilverClient, you will require:
 *Then just run the following command*
 ``` python
     from silver import *
+    
     cert = os.environ("SILVERCORE_CERT")
     key = os.environ("SILVERCORE_KEY")
     sc = SilverCore("HackTrain", "GB", "CH2", cert, key)
+    
 ```
     
 ### Search for available Fares
+
 To start with, you will need to search for available journeys in order to book your trip. 
+
 ``` python
     # Create your passenger - an ID will be generated automatically
     p1 = Passenger(age=30)
-    p2 = Passenger(age=15)
     
     tp1 = TravelPoint(
         origin="GBQQU", 
@@ -41,12 +46,15 @@ To start with, you will need to search for available journeys in order to book y
     fq = FareSearch(
             travel_points = [tp1],
             fare_filter = FARE_FILTER.CHEAPEST,
-            passengers = [p1, p2])
+            passengers = [p1])
     
     fares_result = sc.search_fare(fq)
      
+    # You can query the status of the response
     print fares_result.requestStatus # True
+    
 ```
+
 
 ### Create booking
 Once you find the requests, you will be able to create a booking by selected the legs that you find most convenient, and its respective fare. 
@@ -74,6 +82,8 @@ Once you find the requests, you will be able to create a booking by selected the
     
     print booking_result.requestStatus.success # True
 ```
+
+------
 
 ### Add payment
 Once you have created a booking you can add payments to process the transaction.
@@ -108,6 +118,8 @@ Once you have created a booking you can add payments to process the transaction.
     print payment_response.requestStatus.success # True
 ```
 
+-------
+
 ### Update existing bookings
 You can update your booking, add/remove ticket options, amend, etc.
 ``` python
@@ -127,6 +139,8 @@ You can update your booking, add/remove ticket options, amend, etc.
     print booking_update.requestStatus.success # True
 ``` 
 
+-------
+
 ### Finally - Confirm booking!
 Once you are happy with your booking, you can confirm your option.
 ``` python
@@ -144,6 +158,8 @@ booking_confirm = sc.confirm_booking(b)
 
 print booking_confirm.requestStatus.success # True
 ```
+
+-------
 
 # More Advanced commands
 ### Interact with response objects
@@ -165,139 +181,21 @@ All response objects belong to the SilverRaw module. This was a module created w
     
     fares_result = sc.search_fare(fq)
     
-    print fares_result.requestStatus
-    print fares_result.requestStatus.success
-    
-    fr = fares_result.results
-    
-    for l in fr.legs.leg:
+    # You can also interact with the SilverRaw object returned!
+    # For a more in-depth example, check out the bottom of this document
+    for l in fares_result.results.legs.leg:
         print l.originTravelPoint.value()
         print l.originTravelPoint.type
         print l.destinationTravelPoint.value()
         print l.destinationTravelPoint.type
-    
-        for p in fr.passengers.passenger:
-            print p.passengerSpecID
-            print p.age
-    
+        
         for s in l.legSolutions.legSolution:
             print s.legSolutionID
             print s.overtakenJourney
             print s.duration
     
-            for a in s.availableSeatPreferences.availableSeatPreference:
-                print a.marketingCarrier
-                print a.serviceClass
-                print a.supplierEquipmentType
-                print a.value()
-    
-            for r in s.passengerInformationRequired.passengerInformation:
-                print r.type
-                print r.allPassengers
-    
-            for t in s.travelSegments.travelSegment:
-                print t.sequence
-                print t.travelSegmentID
-                print t.originTravelPoint.type
-                print t.originTravelPoint.value()
-                print t.destinationTravelPoint.type
-                print t.destinationTravelPoint.value()
-                print t.arrivalDateTime
-                print t.designator
-                print t.operatingCarrier.value()
-                print t.supplierEquipmentType.value()
-                print t.duration
-                print t.crossBorderInfo
-                print t.equipmentType.code
-                print t.equipmentType.value()
-                print t.marketingServiceName
-                print t.marketingInformation.serviceCode
-    
-        for p in fr.fareInformation.prices.pointToPointPrice:
-            print p.priceID
-            print p.totalPrice.currency
-            print p.totalPrice.value()
-            print p.holdExpiration
-            
-            for l in p.legReferences.legSolutionIDRef:
-                print l
-    
-            for t in p.ticketableFares.ticketableFare:
-                print t.totalPrice
-                print t.totalPrice.currency
-                print t.totalPrice.value()
-                print t.ticketingOptionsAvailable.TOD
-                print t.ticketingOptionsAvailable.ETK
-                print t.ticketingOptionsAvailable.PAH
-                print t.ticketingOptionsAvailable.EML
-                print t.ticketingOptionsAvailable.DEPARTURE_STATION_TOD
-                print t.ticketingOptionsAvailable.SMS
-                print t.fareOrigin.type
-                print t.fareOrigin.value()
-                print t.fareDestination.type
-                print t.fareDestination.value()
-    
-                if t.fareDestinationTerminals:
-                    for d in t.fareDestinationTerminals.fareDestinationTerminal:
-                        print d.type
-                        print d.value()
-    
-                for r in t.passengerReferences.passengerReference:
-                    print r.passengerIDRef
-                    print r.passengerTypeCode
-    
-                    for c in r.fareCodes.fareCode:
-                        print c.code
-                        print c.serviceClass
-                        print c.travelSegmentIDRef
-                        print c.cabinClass
-                        print c.rewardsEligible
-                        print c.fareClass
-                        print c.fareDisplayName
-                        print c.openReturn
-                        print c.reservable
-                        print c.fareExpirationDateTime
-    
-                        for a in c.amenities.amenity:
-                            print a.type
-                            print a.value()
-    
-                        for f in c.fareApplicabilities.fareApplicability:
-                            print f.outbound
-                            print f.type
-                
-                for r in t.prices.price:
-                    print r.type
-                    print r.currency
-                    print r.value()
-    
-                for o in t.optionalPrices.optionalPrice:
-                    # TODO: Add consumption rules
-                    print o.optionalPriceID
-                    print o.category
-                    print o.applicableTravelSegments.travelSegmentIDRef
-                    print o.maximumBookableQuantity
-    
-                    for u in o.rules.rule:
-                        print u.type
-                        print u.priceType
-                        print u.applicableOrderStatus
-                        print u.refundToVoucher
-    
-                for c in t.commissions.commission:
-                    print c.type
-                    print c.currency
-                    print c.value()
-    
-                for r in t.rules.rule:
-                    print r.type
-                    print r.description
-                    print r.priceType
-                    print r.applicableOrderStatus
-    
-                    if r.penalty:
-                        print r.penalty.currency
-                        print r.penalty.value()
+    # You can also see the raw XML
+    print fares_result.toxml()
 ```
 
 ### Creating objects from XML
@@ -404,6 +302,7 @@ In the case where you are not able to do another full query to the SilverCore ba
 
 # Roadmap
 
+* We need tests
 * Add support for request parameters
 * Add support for response specifications
 * Add support for all other API message flows not created
