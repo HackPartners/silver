@@ -5,9 +5,9 @@ setup(
   version = '0.1',
   description = 'SilverCore API python wrapper',
   author = 'Alejandro Saucedo',
-  author_email = 'Alejandro@hackpartners.com.com',
+  author_email = 'alejandro@hackpartners.com.com',
   url = 'https://github.com/HackTrain/silver',
-  download_url = 'https://github.com/HackTrain/silver/tarball/0.1', # I'll explain this in a second
-  keywords = ['testing', 'logging', 'example'], # arbitrary keywords
+  download_url = 'https://github.com/HackTrain/silver/tarball/0.1', 
+  keywords = ['silvercore', 'silver', 'hackpartners', 'hacktrain', 'hack', 'partners'], 
   classifiers = [],
 )
